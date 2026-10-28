@@ -254,6 +254,7 @@ Voice input (Spec 012) downloads `ggml-breeze-asr-25-q5_0.bin` from https://hugg
 
 - Breeze-ASR-25 by MediaTek Research (https://huggingface.co/MediaTek-Research/Breeze-ASR-25), Apache License 2.0. It is fine-tuned from OpenAI Whisper large-v2 (https://github.com/openai/whisper, MIT License).
 - The q5_0 file is a derivative of Breeze-ASR-25: converted to GGML format and quantized to 5 bits by a third party (shdennlin, published under Apache-2.0). Its weights differ from the original model.
+- Provenance check (2026-10-28): starting from the official MediaTek-Research/Breeze-ASR-25 weights at commit `cffe7ccb404d025296a00758d0a33468bec3a9d0`, an independent converter and quantizer (written for this check; neither whisper.cpp's nor the model repository's scripts were run) reproduce the pinned file byte for byte (sha256 `f51573bd6ef9b1fac0bd09a1652eda58a1a638d824a08771ccdee1102fe5990a`) when f32 tensors are rounded through f16, as the third-party conversion did.
 
 ## Handy (MIT)
 
