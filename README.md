@@ -14,6 +14,16 @@
 - **語音輸入（選用）**：按住右 Shift 說話，放開後文字出現在游標處；也可點一下開始、再點一下結束。使用 Breeze-ASR-25（whisper.cpp，Metal）在本機辨識，模型需在 Taipo App 內另外下載（約 1 GB）。
 - **裝置上 decision model（選用、實驗中）**：引擎不確定時，由本機小模型（Qwen3-0.6B，MLX 4-bit）依上下文重新排序。模型需自行放到 `~/Library/Application Support/Taipo/models/Qwen3-0.6B-MLX-4bit/`。
 
+## 開發路線
+
+| 狀態 | 項目 |
+| --- | --- |
+| 已完成 | 注音／英文解碼與容錯（Spec 001、003、006）、輸入法殼（002）、長句（005）、學習開關與清除（008、010）、英數模式（013）、數字鍵選字（014、017） |
+| 已完成 | 本機語音輸入：Breeze-ASR-25 + whisper.cpp（Spec 011 評估、012 實作） |
+| 實驗中 | 本機 decision model 重新排序候選（Spec 004） |
+| 規劃中 | 游標離開時暫存語音結果、只在數字會選字時顯示候選編號、專有名詞學習 |
+| 之後 | iOS 鍵盤 |
+
 ## 安裝
 
 需求：Apple silicon Mac、macOS 14 以上、Xcode 26（Swift 6.2）。
