@@ -1,0 +1,5 @@
+[
+  { "id": "R3", "name": "two-phrases-runner-up-path", "input": "u t;3xjig6", "expectInTop3": ["一場落實"], "note": "一場＋落實，打錯 1 鍵；每格只留 1 條路徑時不在前 5" },
+  { "id": "R3", "name": "two-phrases-runner-up-path-2", "input": "ek42u4g4g6g4;", "expectInTop3": ["各地事實上"] },
+  { "id": "R4", "name": "single-phrase-unchanged", "input": "su3cl3", "expectTop1": "你好", "note": "正向對照：完全打對的不受影響" }
+]

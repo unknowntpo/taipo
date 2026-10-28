@@ -1,0 +1,7 @@
+caught: D11 switch ignored :: D11: when the switch is off the decider is never called
+caught: D12 asks again for same buffer :: D12: repeated pauses on the same buffer ask once
+caught: D4 stale answer applied :: D4: an answer that arrives after the buffer changed is dropped
+caught: D4 promote ignores buffer :: D4: an answer that arrives after the buffer changed is dropped
+caught: D3 gap ignored :: D3: ambiguity triggers only for close or cross-language top-2, never for tails
+caught: D3 literal counts :: D3: ambiguity triggers only for close or cross-language top-2, never for tails
+caught: D9 errors propagate as keep :: D9: a failing decider keeps the engine order

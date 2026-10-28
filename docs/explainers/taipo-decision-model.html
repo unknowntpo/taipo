@@ -1,0 +1,240 @@
+<title>Taipo 決策模型</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@600;700&family=Noto+Sans+TC:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: one reading column; key strings drawn as keycaps; three actors keep one color each (engine / Clef-mini / LLM). */
+:root {
+  --bg: #f6f7f5;
+  --surface: #ffffff;
+  --fg: #1d2421;
+  --muted: #5d6863;
+  --rule: #d9dfdb;
+  --key: #eceeeb;
+  --key-edge: #c6ccc8;
+  --engine: #3b5b8c;
+  --clef: #12795f;
+  --llm: #a5611b;
+  --warn: #9a3412;
+  --font-display: "Noto Serif TC", "Songti TC", serif;
+  --font-body: "Noto Sans TC", "PingFang TC", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #131816; --surface: #1b211f; --fg: #e5ebe8; --muted: #9aa6a0; --rule: #2e3733;
+    --key: #262e2b; --key-edge: #3c4743; --engine: #8fb0e3; --clef: #5fd1ae; --llm: #e3a35f; --warn: #f0926a;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #131816; --surface: #1b211f; --fg: #e5ebe8; --muted: #9aa6a0; --rule: #2e3733;
+  --key: #262e2b; --key-edge: #3c4743; --engine: #8fb0e3; --clef: #5fd1ae; --llm: #e3a35f; --warn: #f0926a;
+  color-scheme: dark;
+}
+body { background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 16px; line-height: 1.75; }
+main { max-width: 46rem; margin: 0 auto; padding-inline: 16px; padding-block: 40px 72px; display: grid; gap: 40px; }
+section { display: grid; gap: 14px; min-width: 0; }
+h1, h2, h3 { font-family: var(--font-display); text-wrap: balance; margin: 0; line-height: 1.3; }
+h1 { font-size: 2.1rem; }
+h2 { font-size: 1.45rem; padding-top: 8px; border-top: 1px solid var(--rule); }
+h3 { font-size: 1.1rem; }
+p, ul, ol { margin: 0; }
+ul, ol { padding-left: 1.3em; display: grid; gap: 6px; }
+.prov { color: var(--muted); font-size: 0.85rem; }
+.prov code, td code, p code, li code { font-family: var(--font-mono); font-size: 0.85em; }
+.verdict { background: var(--surface); border: 1px solid var(--rule); border-left: 4px solid var(--clef); border-radius: 6px; padding: 18px 20px; display: grid; gap: 10px; }
+.verdict strong { color: var(--clef); }
+kbd { font-family: var(--font-mono); font-size: 0.85em; background: var(--key); border: 1px solid var(--key-edge); border-bottom-width: 2px; border-radius: 4px; padding: 0 5px; white-space: nowrap; }
+.engine { color: var(--engine); } .clef { color: var(--clef); } .llm { color: var(--llm); }
+.scroll { overflow-x: auto; border: 1px solid var(--rule); border-radius: 6px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; font-size: 0.92rem; font-variant-numeric: tabular-nums; }
+th, td { text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+th { font-weight: 700; color: var(--muted); font-size: 0.82rem; letter-spacing: 0.04em; white-space: nowrap; }
+tr:last-child td { border-bottom: 0; }
+td.num { text-align: right; white-space: nowrap; }
+td.win { color: var(--clef); font-weight: 700; }
+.formula { font-family: var(--font-mono); background: var(--surface); border: 1px solid var(--rule); border-radius: 6px; padding: 14px 16px; overflow-x: auto; font-size: 0.95rem; }
+figure { margin: 0; display: grid; gap: 8px; }
+figcaption { color: var(--muted); font-size: 0.88rem; }
+svg text { font-family: var(--font-body); }
+.risk li::marker { color: var(--warn); }
+.gloss { color: var(--muted); font-size: 0.9rem; }
+.gloss b { color: var(--fg); }
+</style>
+
+<main>
+  <header style="display:grid;gap:10px">
+    <h1>Taipo 決策模型</h1>
+    <p class="prov">說明對象：<code>unknowntpo/taipo</code>，分支 <code>feat/005-long-input</code> @ <code>7c50608</code>（2026-10-19）。事實來源：原始碼、<code>swift test</code>（34 個測試全過）、<code>taipo-bench decision</code> 在本機的實測輸出。</p>
+  </header>
+
+  <section class="verdict" aria-label="結論">
+    <p>Taipo 是一個完全在 Mac 本機執行的注音／英文輸入法。它的核心是一個<b class="engine">手調的評分引擎</b>：用「詞頻 − 打錯鍵的懲罰」排序候選。這個引擎在注音打錯一個鍵時，只有 66.8% 把正確答案排第一。</p>
+    <p>新加的 <strong>Clef-mini</strong> 是一個 Cloudflare Clef 式的小型決策模型：用 Qwen3-0.6B 替候選打「這句話自然嗎」的分數，只在引擎不確定時、停頓後於背景執行。在 1,402 筆注音錯字上，它把第一名正確率提高到 <strong>87.5%</strong>，每次決定 p50 135 ms。</p>
+    <p>建議：維持預設關閉、由 Taipo App 開關；下一步是訓練專用的評分頭，並把 Clef-flash（9B）移植成上限參考，看小模型還差多少。</p>
+  </section>
+
+  <section>
+    <h2>一個按鍵走過的路</h2>
+    <figure>
+      <div class="scroll" style="padding:12px">
+        <svg viewBox="0 0 720 300" width="720" height="300" role="img" aria-label="按鍵處理流程：引擎每鍵都跑，決策模型只在有歧義時於背景執行">
+          <defs>
+            <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker>
+          </defs>
+          <g fill="none" stroke="currentColor" stroke-width="1.5" style="color:var(--muted)">
+            <rect x="10" y="40" width="120" height="60" rx="6" fill="var(--key)" stroke="var(--key-edge)"/>
+            <rect x="180" y="40" width="200" height="60" rx="6" fill="var(--surface)" style="stroke:var(--engine)"/>
+            <rect x="430" y="40" width="130" height="60" rx="6" fill="var(--surface)"/>
+            <rect x="600" y="40" width="110" height="60" rx="6" fill="var(--surface)"/>
+            <rect x="330" y="190" width="230" height="70" rx="6" fill="var(--surface)" style="stroke:var(--clef)" stroke-dasharray="5 4"/>
+            <path d="M130 70 H176" marker-end="url(#arrow)"/>
+            <path d="M380 70 H426" marker-end="url(#arrow)"/>
+            <path d="M560 70 H596" marker-end="url(#arrow)"/>
+            <path d="M495 100 V186" marker-end="url(#arrow)" style="stroke:var(--clef)"/>
+            <path d="M560 225 H655 V104" marker-end="url(#arrow)" style="stroke:var(--clef)"/>
+          </g>
+          <g font-size="13" fill="var(--fg)" text-anchor="middle">
+            <text x="70" y="66">按鍵</text>
+            <text x="70" y="86" font-size="11" fill="var(--muted)">例：s u e c l 3</text>
+            <text x="280" y="64" fill="var(--engine)" font-weight="700">TaipoCore 引擎</text>
+            <text x="280" y="84" font-size="11" fill="var(--muted)">鄰鍵模糊 walk + 中／英／混合 DP</text>
+            <text x="495" y="66">候選清單</text>
+            <text x="495" y="86" font-size="11" fill="var(--muted)">每鍵約 3–9 ms</text>
+            <text x="655" y="66">組字區／</text>
+            <text x="655" y="86">候選窗</text>
+            <text x="445" y="218" fill="var(--clef)" font-weight="700">Clef-mini（背景）</text>
+            <text x="445" y="238" font-size="11" fill="var(--muted)">Qwen3-0.6B prefill 打分</text>
+            <text x="445" y="254" font-size="11" fill="var(--muted)">p50 135 ms，不擋打字</text>
+            <text x="560" y="150" font-size="11" fill="var(--clef)" text-anchor="start">有歧義＋開關開＋停頓 150 ms</text>
+            <text x="665" y="160" font-size="11" fill="var(--clef)" text-anchor="start">換第一名</text>
+          </g>
+        </svg>
+      </div>
+      <figcaption>引擎每一鍵都跑且必須在 16 ms 內完成；決策模型只在引擎不確定時才被叫醒，結果晚到也只會調整第一名，使用者若已繼續打字，結果直接丟棄。</figcaption>
+    </figure>
+  </section>
+
+  <section>
+    <h2>Taipo 做了什麼</h2>
+    <p>五份 spec，每份都有驗收 ID、先失敗的測試、mutation 檢查。001 由獨立 verifier 通過並已 merge；002、003 經 verifier 通過，等你審 spec；004、005 尚未經 verifier。</p>
+    <div class="scroll">
+      <table>
+        <thead><tr><th>Spec</th><th>內容</th><th>例子</th></tr></thead>
+        <tbody>
+          <tr><td>001 引擎</td><td>大千注音與英文雙重解讀、鄰鍵模糊修正、使用者字典</td><td><kbd>hrllo</kbd> → hello，<kbd>ki3</kbd> → 我</td></tr>
+          <tr><td>002 輸入法殼</td><td>InputMethodKit 輸入法、空白當一聲、↑↓ 選字、選非第一名即學習</td><td><kbd>up␣</kbd> ↓ Enter 之後 → 音</td></tr>
+          <tr><td>003 中英混打</td><td>同一段按鍵切成中文詞與英文字；未打完的尾巴照原樣顯示</td><td><kbd>5k4ek7cl3vu;4u.32u03tricky</kbd> → 這個好像有點 tricky</td></tr>
+          <tr><td>004 決策模型</td><td>Clef-mini、開關、Taipo App、評估工具</td><td><kbd>suecl3</kbd> → 你好（不是 sue 好）</td></tr>
+          <tr><td>005 長句</td><td>組字區超過 24 鍵自動送出前面的詞，避免長句變回原始按鍵</td><td>「今天的天氣很好…」不再變成 <kbd>rup wu0…</kbd></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2>LLM、決策模型、Clef-mini 差在哪</h2>
+    <p>三者底層都可以是 Transformer。差別在「怎麼產生答案」與「為什麼而訓練」。</p>
+    <div class="scroll">
+      <table>
+        <thead><tr><th></th><th class="llm">一般 LLM</th><th>Jev／Clef（決策模型）</th><th class="clef">Taipo Clef-mini</th></tr></thead>
+        <tbody>
+          <tr><td>怎麼產生答案</td><td>一個字一個字生成文字</td><td>讀一次輸入（prefill），替每個合法選項打分，輸出機率</td><td>讀一次「上下文＋候選」，取候選每個 token 的 log 機率相加</td></tr>
+          <tr><td>結構</td><td>骨幹＋語言模型頭</td><td>Clef：Qwen3.5 骨幹＋另外訓練的 JointSchemaHead（寬 1024、4 層）</td><td>Qwen3-0.6B 骨幹＋現成語言模型頭，沒有另外訓練</td></tr>
+          <tr><td>大小</td><td>—</td><td>Clef-flash 9B（4-bit 約 6.2 GB）、Clef 27B</td><td>317 MB（4-bit）</td></tr>
+          <tr><td>延遲</td><td>隨輸出長度增加</td><td>Jev 據報 70–500 ms</td><td>p50 135 ms、p95 222 ms</td></tr>
+          <tr><td>放在哪</td><td>—</td><td>雲端 API 或本機（open weight）</td><td>本機，輸入法 process 內</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>重點：Clef 不是讓 LLM 回答問題，而是把 LLM 當閱讀器，再接一個專為決策訓練的評分頭。Clef-mini 目前只做到前半（用語言機率打分），評分頭還沒訓練。</p>
+  </section>
+
+  <section>
+    <h2>Clef-mini 怎麼打分</h2>
+    <p>這是經典的 noisy-channel 做法：使用者想打的句子 × 打錯成這些鍵的機率。引擎提供後者，小模型提供前者。</p>
+    <div class="formula">總分 = − 編輯懲罰(候選的修正) + λ × log P<sub>LM</sub>(候選 | 上下文)　　λ = 2</div>
+    <p>以 <kbd>suecl3</kbd>（想打 <kbd>su3cl3</kbd>，<kbd>3</kbd> 誤按成 <kbd>e</kbd>）為例，數字取自 Taipo App 試打畫面：</p>
+    <div class="scroll">
+      <table>
+        <thead><tr><th>候選</th><th class="num engine">引擎分數</th><th class="num clef">LM 分數</th><th>說明</th></tr></thead>
+        <tbody>
+          <tr><td class="win">你好</td><td class="num">−18.4</td><td class="num win">−8.5</td><td>需要一次修正，但句子最自然</td></tr>
+          <tr><td>妳好</td><td class="num">−20.5</td><td class="num">−17.2</td><td></td></tr>
+          <tr><td>鳥</td><td class="num">−21.2</td><td class="num">−12.4</td><td></td></tr>
+          <tr><td>sue 好</td><td class="num">−22.8</td><td class="num">−29.8</td><td>0 次修正，但語言上很怪</td></tr>
+          <tr><td>理好</td><td class="num">−25.0</td><td class="num">−17.6</td><td></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>引擎分不出 <code>sue</code> 和 <code>is</code>，因為英文詞庫 SCOWL 只有粗略分級，兩者同一級。小模型看的是整句話，能分出來。</p>
+  </section>
+
+  <section>
+    <h2>評估結果</h2>
+    <p>1,508 筆有標準答案的輸入，上下文為空。標準答案來自產生錯字前的原詞。</p>
+    <div class="scroll">
+      <table>
+        <thead><tr><th>類別</th><th class="num">筆數</th><th class="num engine">只用引擎</th><th class="num">λ=1</th><th class="num clef">λ=2</th><th class="num">λ=4</th><th class="num">答案在前 5</th></tr></thead>
+        <tbody>
+          <tr><td>注音鄰鍵錯字</td><td class="num">1,402</td><td class="num">66.8%</td><td class="num">86.7%</td><td class="num win">87.5%</td><td class="num">84.3%</td><td class="num">97.2%</td></tr>
+          <tr><td>中文＋短英文</td><td class="num">96</td><td class="num">87.5%</td><td class="num">87.5%</td><td class="num">87.5%</td><td class="num">87.5%</td><td class="num">95.8%</td></tr>
+          <tr><td>混合句</td><td class="num">10</td><td class="num">100%</td><td class="num">100%</td><td class="num">100%</td><td class="num">100%</td><td class="num">100%</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <ul>
+      <li>只在引擎判定有歧義時才問模型（794／1,402 筆）。改成「每次都問」並沒有更準（86.6%），還多一倍呼叫。</li>
+      <li>「答案在前 5」是上限：模型只能從引擎給的候選中挑，97.2% 代表重新排序最多還能再進步約 10 點。</li>
+      <li>載入模型約 0.9 秒；含模型的 process 約 380–440 MB。</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>為什麼這樣選</h2>
+    <ul>
+      <li><b>不用 Apple Foundation Models</b>：你明確不要；實測時它在兩題簡單題都答錯，暖機 6 秒。</li>
+      <li><b>不用雲端 Jev／Clef</b>：輸入法看得到每個按鍵，送出去等於側錄；而且每鍵只有 16 ms。</li>
+      <li><b>不直接用 Clef-flash</b>：9B、約 6 GB，放進輸入法太大；只適合當離線評估的上限參考。</li>
+      <li><b>不用社群的小型「Jev-style」模型</b>：來源與訓練資料無法查證，有的授權不可商用。</li>
+      <li><b>執行環境用 MLX</b>：Apple 開源（MIT），在 Apple Silicon GPU 上跑；需要 Xcode 的 Metal Toolchain 才能建置。</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>證據</h2>
+    <ul>
+      <li>評分與載入：<code>Sources/TaipoDecision/ClefMini.swift</code>（λ 在第 26 行，<code>choose</code> 第 45 行，<code>languageScores</code> 第 55 行）。</li>
+      <li>觸發條件與取消：<code>Sources/TaipoIME/Decision.swift</code>（<code>isAmbiguous</code> 第 39 行，<code>schedule</code> 第 67 行，buffer 不變才套用第 84 行）。</li>
+      <li>引擎：<code>Sources/TaipoCore/Decoder.swift</code>（<code>decode</code> 第 96 行，混合切分第 254 行）、<code>Sources/TaipoCore/Walk.swift</code> 第 33 行。</li>
+      <li>評估輸出：<code>docs/specs/004-decision-model/evidence/eval.txt</code>；語料產生器 <code>scripts/make_eval_corpus.py</code>。</li>
+      <li>Clef 結構：<code>~/Library/Application Support/Taipo/models/clef-flash-4bit/clef_mlx.py</code> 與 <code>joint_head_config.json</code>（只讀，未執行）。</li>
+      <li>Spec：<code>docs/specs/004-decision-model/spec.md</code>、<code>docs/specs/005-long-input/spec.md</code>。</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>缺口與風險</h2>
+    <ul class="risk">
+      <li>Spec 004、005 還沒經過獨立 verifier；只有作者自己的測試與 mutation。</li>
+      <li>評估時上下文一律為空；實際打字時會帶入游標前的文字，效果可能更好也可能不同，還沒量。</li>
+      <li>決策模型在真實輸入法中只做過啟動與載入的 smoke test，沒有逐鍵的端到端量測。</li>
+      <li>最近一次延遲量測時系統負載平均 110（OrbStack 佔 271% CPU），改動前後都超出 16 ms，需在閒置時重測。</li>
+      <li>Clef-mini 沒有訓練評分頭，只是借用語言機率；「答案在前 5」到 87.5% 之間的差距是它的天花板。</li>
+      <li>英文詞庫缺 <code>ok</code>、<code>OK</code> 等只以大寫收錄的字；結尾英文字保護規則有已知取捨（<kbd>w8 apt</kbd> 會變成「他 apt」）。</li>
+      <li>CI 改到 macOS 26 runner 後還沒看到綠燈。</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>待你決定</h2>
+    <ol>
+      <li>要不要讓 Clef-mini 預設開啟？（目前正確率 +20.7 點、記憶體多約 400 MB）</li>
+      <li>下一步先做哪個：移植 Clef-flash 評分頭當上限參考，或用合成錯字資料訓練 Clef-mini 自己的評分頭？</li>
+      <li>是否接受真實英文詞頻資料（例如 Google Books Ngram，CC BY 3.0）來補 <code>ok</code> 等缺字？</li>
+      <li>審查並 merge PR #2 → #3 → #4 → #5 的順序是否 OK？</li>
+    </ol>
+  </section>
+
+  <p class="gloss"><b>大千</b>：台灣標準注音鍵盤配置。<b>prefill</b>：模型一次讀完輸入、不生成新字的計算。<b>log 機率</b>：機率取對數，越接近 0 越可能。<b>noisy channel</b>：把「想說什麼」與「怎麼打錯」分開估計再相乘的模型。<b>λ</b>：語言分數的權重。<b>mutation</b>：故意改壞程式，確認測試抓得到。<b>SCOWL</b>：開源英文字表，只有常用度分級沒有次數。</p>
+</main>

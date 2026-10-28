@@ -1,0 +1,19 @@
+.build/
+.swiftpm/
+DerivedData/
+*.xcuserstate
+.DS_Store
+Data/raw/
+
+# Audio, model weights and evaluation outputs never go into the repo
+*.wav
+*.m4a
+*.flac
+*.caf
+*.mp3
+*.bin
+*.gguf
+*.safetensors
+*.profraw
+results/
+models/

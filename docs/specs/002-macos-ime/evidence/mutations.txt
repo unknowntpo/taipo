@@ -1,0 +1,18 @@
+caught: I2 space never tone :: I27: backspace-removes-tone-space, I2: space-as-tone1, I7: commit-first-does-not-learn, I7: commit-non-first-learns
+caught: I2 space accepts fuzzy tone :: I2: space-after-tone-commits-chinese, X14: Space commits the first complete candidate instead of an unfinished tail
+caught: I2 english no trailing space :: I10: capitalized-english, I16: digits-literal, I2: space-commits-english, I2: space-uses-selected-language
+caught: I3 enter passes :: I3: enter-commits
+caught: I4 escape keeps buffer :: I21: selection-resets-after-escape, I4: escape-clears
+caught: I5 backspace no refresh :: I20: backspace-to-empty-clears, I27: backspace-removes-tone-space, I5: backspace-removes-key
+caught: I6 selection wraps :: I29: up-after-clamp, I2: space-uses-selected-language, I6: up-clamps-at-first
+caught: I7 always learns :: I7: commit-first-adds-no-user-word, X14: Space commits the first complete candidate instead of an unfinished tail
+caught: I7 never learns :: I10: capitalized-learned-choice, I14: diagnostics are drained once taken, I14: learn write failure still commits and records a diagnostic, I22: session keeps working after a failed learn
+caught: I8 other key consumed :: I8: modified-key-commits-then-passes, I8: other-key-commits-then-passes
+caught: I9 no language hint :: I9: english-context-keeps-english
+caught: I10 learned not capitalized :: I10: capitalized-learned-choice
+caught: I2 space uses first language :: I2: space-uses-selected-language, X14: Space commits the first complete candidate instead of an unfinished tail
+caught: I2 punctuation not layout :: I1: punctuation-keys-are-zhuyin, X2: the IME commits a mixed sentence and adds a space after the English word
+caught: I10 no capitalization :: I10: capitalized-english, I10: capitalized-learned-choice
+caught: I21 selection not reset :: I21: selection-resets-after-typing
+caught: I26 uppercase digits layout :: I10: capitalized-english, I10: capitalized-learned-choice, I26: uppercase-zhuyin-is-literal
+caught: I13 router throws through :: 

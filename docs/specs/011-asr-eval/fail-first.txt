@@ -1,0 +1,10 @@
+# swift test --filter TaipoSpeechTests against stubs (2026-10-26)
+✘ Test "S3: simplified output counts as errors; Example row two is 3/8" failed after 0.001 seconds with 1 issue.
+✘ Test "S1: Han characters are one token each; letter and digit runs are one token" failed after 0.001 seconds with 3 issues.
+✘ Test "S7: malformed JSONL lines are skipped and counted without stopping the report" failed after 0.001 seconds with 5 issues.
+✘ Test "S1: normalization drops punctuation and whitespace, folds full-width and case" failed after 0.001 seconds with 2 issues.
+✘ Test "S4: sentences without a recording or a result are missing and excluded from MER" failed after 0.001 seconds with 8 issues.
+✘ Test "S4: sentences.tsv and results JSONL load into ids, texts and timings" failed after 0.001 seconds with 3 issues.
+✘ Test "S2: MER is edit distance over reference token count" failed after 0.001 seconds with 4 issues.
+✘ Test "S4: report gives s2twp MER, mean latency, RTF and worst sentences first" failed after 0.001 seconds with 6 issues.
+✘ Test run with 8 tests in 0 suites failed after 0.001 seconds with 32 issues.

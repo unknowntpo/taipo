@@ -1,0 +1,15 @@
+✘ Test "U3: clear removes the file through the injected remover and posts the notification" recorded an issue at ClearLearningTests.swift:44:5: Expectation failed: try UserDictionaryStore.clear(at: url, remove: remove, notify: { posted += 1 })
+✘ Test "U5: a failed removal throws and posts nothing" recorded an issue at ClearLearningTests.swift:61:5: Expectation failed: an error was expected but none was thrown and "false" was returned
+✘ Test "U2: entryCount counts choices plus new words, and is 0 without a file" recorded an issue at ClearLearningTests.swift:33:5: Expectation failed: (UserDictionaryStore.entryCount(at: url) → 0) >= 2
+✘ Test "U5: a failed removal throws and posts nothing" recorded an issue at ClearLearningTests.swift:65:5: Expectation failed: (UserDictionaryStore.entryCount(at: url) → 0) > 0
+✘ Test "U2: entryCount counts choices plus new words, and is 0 without a file" failed after 2.444 seconds with 1 issue.
+✘ Test "U5: a failed removal throws and posts nothing" failed after 2.444 seconds with 2 issues.
+✘ Test "U3: clear removes the file through the injected remover and posts the notification" recorded an issue at ClearLearningTests.swift:45:5: Expectation failed: (removed → []) == ([url] → [file:///var/folders/yt/l_0c2zg96r32wyfdnm81y8zm0000gn/T/taipo-clear-0520B9BF-87B1-4C78-B803-A8743254CBC7/user.json])
+✘ Test "U3: clear removes the file through the injected remover and posts the notification" recorded an issue at ClearLearningTests.swift:46:5: Expectation failed: (posted → 0) == 1
+✘ Test "U3: clear removes the file through the injected remover and posts the notification" recorded an issue at ClearLearningTests.swift:50:5: Expectation failed: (removed.count → 0) == 1
+✘ Test "U3: clear removes the file through the injected remover and posts the notification" recorded an issue at ClearLearningTests.swift:51:5: Expectation failed: (posted → 0) == 2
+✘ Test "U3: clear removes the file through the injected remover and posts the notification" failed after 2.444 seconds with 5 issues.
+✘ Test "U1: clearing the user dictionary restores the engine's order, and learning still works after" recorded an issue at ClearLearningTests.swift:20:5: Expectation failed: (session.markedText → "音") == "因"
+✘ Test "U1: clearing the user dictionary restores the engine's order, and learning still works after" recorded an issue at ClearLearningTests.swift:23:5: Expectation failed: (session.markedText → "因") == "音"
+✘ Test "U1: clearing the user dictionary restores the engine's order, and learning still works after" failed after 2.457 seconds with 2 issues.
+✘ Test run with 4 tests in 0 suites failed after 2.458 seconds with 10 issues.

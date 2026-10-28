@@ -1,0 +1,3 @@
+✘ Test "R1: after a pause, a deep pass recovers a three-slip phrase the fast pass misses" recorded an issue at SessionTests.swift:214:5: Expectation failed: (session → TaipoIME.CompositionSession).deepen()
+✘ Test "R1: after a pause, a deep pass recovers a three-slip phrase the fast pass misses" recorded an issue at SessionTests.swift:215:5: Expectation failed: (session.markedText → "沒想導") == "沒想到"
+✘ Test "R1: after a pause, a deep pass recovers a three-slip phrase the fast pass misses" failed after 7.724 seconds with 2 issues.

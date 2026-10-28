@@ -1,0 +1,22 @@
+# Spec 017 fail-first：在 origin/main（bc2e395，未改 Sources）上執行新測試，2026-10-27
+# swift test --filter <Spec 017 tests>
+✔ Test "A7: typed letters shown first (no dictionary word) → the digit composes" passed after 2.032 seconds.
+✔ Test "A10: 0 is ㄢ and never selects, even after an English word" passed after 2.042 seconds.
+✔ Test "A4: typed letters that are a dictionary word rank above fuzzy-corrected words" with 4 test cases passed after 2.043 seconds.
+✔ Test "A9: an English word first, then a digit that starts a syllable, composes (a + 8 = ㄇㄚ)" passed after 2.044 seconds.
+✘ Test "A6: a digit past the last row is swallowed" recorded an issue at EnglishDigitSelectTests.swift:62:5: Expectation failed: (session.buffer → "lexus4") == "lexus"
+✘ Test "A6: a digit past the last row is swallowed" failed after 2.060 seconds with 1 issue.
+✔ Test "A8: a mixed sentence shown first → the digit composes" passed after 2.166 seconds.
+✔ Test "A3: an English word first, then a tone digit that makes a Chinese reading, composes" with 2 test cases passed after 2.202 seconds.
+✘ Test "A1: lexus then 3 commits the candidate shown on row 3 and learns like Enter" recorded an issue at EnglishDigitSelectTests.swift:32:5: Expectation failed: (session.handle(.char("3")) → Response(consumed: true, commit: nil)) == (Response(consumed: true, commit: third) → Response(consumed
+✘ Test "A1: lexus then 3 commits the candidate shown on row 3 and learns like Enter" recorded an issue at EnglishDigitSelectTests.swift:33:5: Expectation failed: (session.buffer → "lexus3").isEmpty → false
+✘ Test "A1: lexus then 3 commits the candidate shown on row 3 and learns like Enter" recorded an issue at EnglishDigitSelectTests.swift:34:5: Expectation failed: (FileManager.default → <NSFileManager: 0x105059100>).fileExists(atPath: url.path → "/var/folders/yt/l_0c2zg96r32wyfdnm81y8zm0000gn/T
+✘ Test "A1: lexus then 3 commits the candidate shown on row 3 and learns like Enter" failed after 2.221 seconds with 3 issues.
+✔ Test "A2: Zhuyin typing is unchanged: tone digits compose (positive control for A1)" with 3 test cases passed after 2.261 seconds.
+✘ Test run with 9 tests in 0 suites failed after 2.261 seconds with 4 issues.
+
+# A4 在 origin/main 已通過（排名是現有行為）。證據改用 mutation：
+# Decoder.rank 改成只按分數排序時，A4 失敗：
+✘ Test "A4: ..." recorded an issue with 1 argument word → "baht"
+✘ Test "A4: ..." recorded an issue with 1 argument word → "froward"
+# 其他 mutation：拿掉注音讀音開頭判斷 → A9 失敗；拿掉解碼判斷 → A3 失敗；允許原樣字母／混打句 → A7、A8 失敗。

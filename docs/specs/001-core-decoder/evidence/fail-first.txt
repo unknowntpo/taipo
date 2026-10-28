@@ -1,0 +1,56 @@
+✘ Test decoderCase(_:) recorded an issue with 1 argument c → B2: zh-exact at DecoderCaseTests.swift:44:38: Expectation failed: (texts.first → nil) == (expected → "我")
+✘ Test "B1: every candidate carries text, language, edits and score" recorded an issue at DecoderNamedTests.swift:15:21: Expectation failed: candidates.first { $0.text == "hello" } → nil
+✘ Test decoderCase(_:) recorded an issue with 1 argument c → B3: zh-phrase at DecoderCaseTests.swift:44:38: Expectation failed: (texts.first → nil) == (expected → "你好")
+✘ Test decoderCase(_:) recorded an issue with 1 argument c → B2: en-exact at DecoderCaseTests.swift:44:38: Expectation failed: (texts.first → nil) == (expected → "hello")
+✘ Test "B7: learned choice persists across restart" recorded an issue at DecoderNamedTests.swift:28:5: Expectation failed: (first.decode("teh", previousLanguage: nil).candidates.first?.text → nil) == "the"
+✘ Test decoderCase(_:) recorded an issue with 1 argument c → B2: zh-exact at DecoderCaseTests.swift:45:42: Expectation failed: (result.candidates.first?.language → nil) == (lang → .zh)
+✘ Test decoderCase(_:) recorded an issue with 1 argument c → B2: en-exact at DecoderCaseTests.swift:45:42: Expectation failed: (result.candidates.first?.language → nil) == (lang → .en)
+✘ Test "F5: missing user dictionary starts empty and is created on first learn" recorded an issue at DecoderNamedTests.swift:54:5: Expectation failed: (FileManager.default → <NSFileManager: 0x104d4f940>).fileExists(atPath: url.path → "/var/folders/yt/l_0c2zg96r32wyfdnm81y8zm0000gn/T/taipo-tests-D39E670F-9C33-4F64-A44F-1E8BC8410D22/nested/user.json")
+✘ Test "F8: missing or malformed lexicon throws LexiconError" recorded an issue at DecoderNamedTests.swift:71:5: Expectation failed: an error was expected but none was thrown and "TaipoCore.Lexicon" was returned
+✘ Test "O1: explain lists language, edits, score and fuzzy state" recorded an issue at DecoderNamedTests.swift:86:5: Expectation failed: (text → "").contains("fuzzy: on")
+✘ Test "O1: explain lists language, edits, score and fuzzy state" recorded an issue at DecoderNamedTests.swift:87:5: Expectation failed: (text → "").contains("hello")
+✘ Test "O1: explain lists language, edits, score and fuzzy state" recorded an issue at DecoderNamedTests.swift:88:5: Expectation failed: (text → "").contains("[en]")
+✘ Test "B7: learned choice persists across restart" recorded an issue at DecoderNamedTests.swift:31:5: Expectation failed: (second.decode("teh", previousLanguage: nil).candidates.first?.text → nil) == "teh"
+✘ Test decoderCase(_:) recorded an issue with 1 argument c → B4: en-adjacent at DecoderCaseTests.swift:44:38: Expectation failed: (texts.first → nil) == (expected → "hello")
+✘ Test decoderCase(_:) recorded an issue with 1 argument c → B4: zh-adjacent at DecoderCaseTests.swift:46:40: Expectation failed: (top3 → []).contains(word → "我")
+✘ Test decoderCase(_:) recorded an issue with 1 argument c → B4: en-transpose at DecoderCaseTests.swift:44:38: Expectation failed: (texts.first → nil) == (expected → "the")
+✘ Test "F8: missing or malformed lexicon throws LexiconError" recorded an issue at DecoderNamedTests.swift:74:5: Expectation failed: an error was expected but none was thrown and "TaipoCore.Lexicon" was returned
+✘ Test "O1: explain lists language, edits, score and fuzzy state" recorded an issue at DecoderNamedTests.swift:89:5: Expectation failed: (text → "").contains("substitute r→e")
+✘ Test "F6: write failure throws but the in-memory choice still applies" recorded an issue at DecoderNamedTests.swift:63:5: Expectation failed: an error was expected but none was thrown
+✘ Test "O1: explain lists language, edits, score and fuzzy state" recorded an issue at DecoderNamedTests.swift:90:5: Expectation failed: (decoder.explain(String(repeating: "a", count: 33), previousLanguage: nil) → "").contains("fuzzy: off")
+✘ Test "F6: write failure throws but the in-memory choice still applies" recorded an issue at DecoderNamedTests.swift:64:5: Expectation failed: (decoder.decode("teh", previousLanguage: nil).candidates.first?.text → nil) == "teh"
+✘ Test decoderCase(_:) recorded an issue with 1 argument c → B4: budget-5-keys-2-edits at DecoderCaseTests.swift:49:9: Expectation failed: !((texts → []).isEmpty → true → true)
+✘ Test decoderCase(_:) recorded an issue with 1 argument c → B6: zh-only-exact at DecoderCaseTests.swift:45:42: Expectation failed: (result.candidates.first?.language → nil) == (lang → .zh)
+✘ Test decoderCase(_:) recorded an issue with 1 argument c → B4: budget-6-keys-2-edits at DecoderCaseTests.swift:46:40: Expectation failed: (top3 → []).contains(word → "typing")
+✘ Test decoderCase(_:) recorded an issue with 1 argument c → B4: en-non-adjacent at DecoderCaseTests.swift:49:9: Expectation failed: !((texts → []).isEmpty → true → true)
+✘ Test decoderCase(_:) recorded an issue with 1 argument c → B5: exact-not-corrected at DecoderCaseTests.swift:44:38: Expectation failed: (texts.first → nil) == (expected → "form")
+✘ Test decoderCase(_:) recorded an issue with 1 argument c → B6: en-only-exact at DecoderCaseTests.swift:44:38: Expectation failed: (texts.first → nil) == (expected → "us")
+✘ Test decoderCase(_:) recorded an issue with 1 argument c → B4: budget-2-keys at DecoderCaseTests.swift:49:9: Expectation failed: !((texts → []).isEmpty → true → true)
+✘ Test "F4: corrupt user dictionary is quarantined and decoder starts empty" recorded an issue at DecoderNamedTests.swift:40:5: Expectation failed: (decoder.decode("teh", previousLanguage: nil).candidates.first?.text → nil) == "the"
+✘ Test decoderCase(_:) recorded an issue with 1 argument c → B6: en-only-exact at DecoderCaseTests.swift:45:42: Expectation failed: (result.candidates.first?.language → nil) == (lang → .en)
+✘ Test decoderCase(_:) recorded an issue with 1 argument c → B5: exact-not-corrected at DecoderCaseTests.swift:46:40: Expectation failed: (top3 → []).contains(word → "from")
+✘ Test "F4: corrupt user dictionary is quarantined and decoder starts empty" recorded an issue at DecoderNamedTests.swift:41:5: Expectation failed: decoder.diagnostics.contains { $0.contains("corrupt") }
+✘ Test decoderCase(_:) recorded an issue with 1 argument c → B6: tie-prev-zh at DecoderCaseTests.swift:44:38: Expectation failed: (texts.first → nil) == (expected → "音")
+✘ Test decoderCase(_:) recorded an issue with 1 argument c → B7: learn-literal at DecoderCaseTests.swift:44:38: Expectation failed: (texts.first → nil) == (expected → "teh")
+✘ Test decoderCase(_:) recorded an issue with 1 argument c → B6: tie-prev-en at DecoderCaseTests.swift:44:38: Expectation failed: (texts.first → nil) == (expected → "up")
+✘ Test decoderCase(_:) recorded an issue with 1 argument c → B6: tie-no-hint at DecoderCaseTests.swift:44:38: Expectation failed: (texts.first → nil) == (expected → "音")
+✘ Test decoderCase(_:) recorded an issue with 1 argument c → B7: user-word-control at DecoderCaseTests.swift:49:9: Expectation failed: !((texts → []).isEmpty → true → true)
+✘ Test decoderCase(_:) recorded an issue with 1 argument c → B8: literal-always at DecoderCaseTests.swift:51:46: Expectation failed: (texts → []).contains(word → "qqqqq")
+✘ Test decoderCase(_:) recorded an issue with 1 argument c → B7: user-word-fuzzy at DecoderCaseTests.swift:46:40: Expectation failed: (top3 → []).contains(word → "taipo")
+✘ Test "F5: missing user dictionary starts empty and is created on first learn" failed after 0.002 seconds with 1 issue.
+✘ Test "B1: every candidate carries text, language, edits and score" failed after 0.002 seconds with 1 issue.
+✘ Test decoderCase(_:) recorded an issue with 1 argument c → F7: tone-keys-only at DecoderCaseTests.swift:51:46: Expectation failed: (texts → []).contains(word → "3333")
+✘ Test "O1: explain lists language, edits, score and fuzzy state" failed after 0.003 seconds with 5 issues.
+✘ Test "B7: learned choice persists across restart" failed after 0.002 seconds with 2 issues.
+✘ Test decoderCase(_:) recorded an issue with 1 argument c → F7: tone-keys-only at DecoderCaseTests.swift:56:9: Expectation failed: (texts → []).contains(c.input → "3333")
+✘ Test decoderCase(_:) recorded an issue with 1 argument c → F2: over-max-length at DecoderCaseTests.swift:52:36: Expectation failed: (texts.count → 0) == (count → 1)
+✘ Test decoderCase(_:) recorded an issue with 1 argument c → F2: max-length at DecoderCaseTests.swift:53:36: Expectation failed: (result.fuzzyEnabled → false) == (fuzzy → true)
+✘ Test "F6: write failure throws but the in-memory choice still applies" failed after 0.002 seconds with 2 issues.
+✘ Test "F8: missing or malformed lexicon throws LexiconError" failed after 0.003 seconds with 2 issues.
+✘ Test decoderCase(_:) recorded an issue with 1 argument c → F3: non-layout-chars at DecoderCaseTests.swift:44:38: Expectation failed: (texts.first → nil) == (expected → "café")
+✘ Test decoderCase(_:) recorded an issue with 1 argument c → F3: non-layout-chars at DecoderCaseTests.swift:56:9: Expectation failed: (texts → []).contains(c.input → "café")
+✘ Test decoderCase(_:) with 25 test cases failed after 0.003 seconds with 30 issues.
+✘ Test "F4: corrupt user dictionary is quarantined and decoder starts empty" recorded an issue at DecoderNamedTests.swift:43:5: Expectation failed: files.contains { $0.hasPrefix("user.json.corrupt-") }
+✘ Test "F4: corrupt user dictionary is quarantined and decoder starts empty" recorded an issue at DecoderNamedTests.swift:44:5: Expectation failed: !((files → ["user.json"]).contains("user.json") → true)
+✘ Test "F4: corrupt user dictionary is quarantined and decoder starts empty" failed after 0.003 seconds with 4 issues.
+✘ Test run with 8 tests in 0 suites failed after 0.003 seconds with 47 issues.

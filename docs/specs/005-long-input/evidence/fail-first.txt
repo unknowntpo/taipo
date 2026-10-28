@@ -1,0 +1,8 @@
+◇ Test run started.
+✔ Test "L3: short input never auto-commits" passed after 2.987 seconds.
+✘ Test "L2: the composition never grows beyond the auto-commit threshold while it parses" recorded an issue at SessionTests.swift:196:5: Expectation failed: (longest → 34) <= (CompositionSession.autoCommitAbove → 24)
+✘ Test "L2: the composition never grows beyond the auto-commit threshold while it parses" failed after 4.542 seconds with 1 issue.
+✘ Test "L1: a long Zhuyin sentence commits its leading phrases instead of becoming raw keys" recorded an issue at SessionTests.swift:183:5: Expectation failed: (committed → "rup wu0 2k7wu0 fu4cp3cl3cp3g4ck6tj ap6m/422j/4i").hasPrefix("今天的天氣很好很")
+✘ Test "L1: a long Zhuyin sentence commits its leading phrases instead of becoming raw keys" recorded an issue at SessionTests.swift:184:5: Expectation failed: !((committed → "rup wu0 2k7wu0 fu4cp3cl3cp3g4ck6tj ap6m/422j/4i").contains("rup") → true)
+✘ Test "L1: a long Zhuyin sentence commits its leading phrases instead of becoming raw keys" failed after 4.709 seconds with 2 issues.
+✘ Test run with 3 tests in 0 suites failed after 4.710 seconds with 3 issues.

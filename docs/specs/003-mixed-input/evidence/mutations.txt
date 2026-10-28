@@ -1,0 +1,19 @@
+caught: X15 trailing word unprotected :: X15: trailing-english-kept, X15: trailing-english-not-substituted
+caught: X15 only extra edits blocked :: X15: trailing-english-not-substituted
+caught: X15 mixed not filtered :: X15: trailing-english-kept, X15: trailing-english-not-substituted
+caught: X1 no switch penalty :: X3: zh-typo-not-rare-english
+caught: X4 tail need not start a syllable :: X10: mixed-fuzzy-en, X15: trailing-english-kept, X15: trailing-english-not-substituted, X1: mixed-zh-en
+caught: X6 single-letter english :: X4: single-letter-tail
+caught: X2 no space between segments :: X10: mixed-fuzzy-en, X14: Space commits the first complete candidate instead of an unfinished tail, X15: trailing-english-kept, X15: trailing-english-not-substituted
+caught: X2 no space between english words :: X2: space-between-english-words
+caught: X4 tail after english :: X4: tail-only-after-chinese
+caught: X4 tail after edits :: X15: trailing-english-kept, X15: trailing-english-not-substituted, X4: no-tail-after-fixed-prefix
+caught: X3 tail shares cell with parses :: X14: Space commits the first complete candidate instead of an unfinished tail, X3: two-letter-english-word
+caught: X1 mixed disabled :: X10: mixed-fuzzy-en, X12: explain lists the segments of a mixed candidate, X14: Space commits the first complete candidate instead of an unfinished tail, X15: trailing-english-kept
+caught: X2 english does not absorb space :: X2: mixed-spacing, X2: space-between-english-words, X2: the IME commits a mixed sentence and adds a space after the English word
+caught: X4 tail allows tone keys :: X4: three-key-tail
+caught: X4 tail penalty above edit :: X4: three-key-tail
+caught: X5 language is first segment :: X14: Space commits the first complete candidate instead of an unfinished tail, X2: the IME commits a mixed sentence and adds a space after the English word, X5: mixed-language-is-last, X5: mixed-language-is-last-zh
+caught: X12 explain without segments :: X12: explain lists the segments of a mixed candidate
+caught: X14 space commits tail :: X14: Space commits the first complete candidate instead of an unfinished tail
+caught: X14 space commit learns :: X14: Space commits the first complete candidate instead of an unfinished tail

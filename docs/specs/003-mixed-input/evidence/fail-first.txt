@@ -1,0 +1,9 @@
+Test "X12
+→ X10: mixed-fuzzy-en
+→ X1: mixed-zh-en
+→ X2: mixed-en-zh
+→ X2: mixed-spacing
+→ X3: mixed-beats-fuzzy
+→ X4: partial-tail
+→ X4: tail-not-tone
+→ X5: mixed-language-is-last

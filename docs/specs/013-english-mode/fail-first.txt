@@ -1,0 +1,12 @@
+✘ Test "E1: a Shift tap is a quick press and release with nothing else in between" recorded an issue at EnglishModeTests.swift:10:5: Expectation failed: (d → TaipoIME.ShiftTapDetector).shift(down: false, at: 0.2, otherModifiers: false)
+✘ Test "E1: a Shift tap is a quick press and release with nothing else in between" failed after 0.001 seconds with 1 issue.
+✘ Test "E3: switching while composing commits the shown candidate without learning" recorded an issue at EnglishModeTests.swift:48:5: Expectation failed: (session.toggleEnglishMode() → nil) == "婐"
+✘ Test "E3: switching while composing commits the shown candidate without learning" recorded an issue at EnglishModeTests.swift:49:5: Expectation failed: (session.buffer → "ji3").isEmpty → false
+✘ Test "E3: switching while composing commits the shown candidate without learning" failed after 1.593 seconds with 2 issues.
+✘ Test "E2: in English mode no key is intercepted and nothing composes" recorded an issue at EnglishModeTests.swift:35:5: Expectation failed: (session → TaipoIME.CompositionSession).isEnglishMode → false
+✘ Test "E2: in English mode no key is intercepted and nothing composes" recorded an issue at EnglishModeTests.swift:37:9: Expectation failed: (session.handle(key) → Response(consumed: true, commit: nil)) == Response(consumed: false, commit: nil)
+✘ Test "E2: in English mode no key is intercepted and nothing composes" recorded an issue at EnglishModeTests.swift:37:9: Expectation failed: (session.handle(key) → Response(consumed: true, commit: nil)) == Response(consumed: false, commit: nil)
+✘ Test "E2: in English mode no key is intercepted and nothing composes" recorded an issue at EnglishModeTests.swift:37:9: Expectation failed: (session.handle(key) → Response(consumed: true, commit: nil)) == Response(consumed: false, commit: nil)
+✘ Test "E2: in English mode no key is intercepted and nothing composes" recorded an issue at EnglishModeTests.swift:37:9: Expectation failed: (session.handle(key) → Response(consumed: true, commit: Optional("我"))) == Response(consumed: false, commit: nil)
+✘ Test "E2: in English mode no key is intercepted and nothing composes" failed after 8.079 seconds with 5 issues.
+✘ Test run with 5 tests in 0 suites failed after 8.080 seconds with 8 issues.

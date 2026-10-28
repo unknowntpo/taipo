@@ -1,0 +1,9 @@
+Taipo
+Copyright 2026 Eric Chang
+
+This product is licensed under the Apache License, Version 2.0 (see LICENSE).
+
+This product includes data and software derived from third-party works,
+including McBopomofo (MIT), libtabe (BSD), the English Speller Database / SCOWL,
+whisper.cpp (MIT), and Handy (MIT). See THIRD_PARTY_NOTICES.md for their
+copyright notices and license terms.

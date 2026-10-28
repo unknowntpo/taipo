@@ -1,0 +1,17 @@
+Spec 006 fast pass (2 paths per cell, every keystroke)
+typos  kind          n     top1    top5    top20
+    1  phrase        366   73.8%   98.1%   99.2%
+    1  two-phrases   194   76.3%   94.8%   94.8%
+    2  phrase        353   52.1%   70.0%   73.7%
+    2  two-phrases   180   69.4%   87.8%   87.8%
+    3  phrase        337   14.5%   21.4%   21.7%
+    3  two-phrases   175    9.7%   14.3%   14.3%
+
+Spec 006 after pause (deep: retry 2→3 for 6–24 keys)
+typos  kind          n     top1    top5    top20
+    1  phrase        366   73.8%   98.1%   99.2%
+    1  two-phrases   194   76.3%   94.8%   94.8%
+    2  phrase        353   52.1%   70.3%   73.9%
+    2  two-phrases   180   70.6%   88.9%   88.9%
+    3  phrase        337   35.9%   55.2%   58.8%
+    3  two-phrases   175   47.4%   64.0%   64.0%

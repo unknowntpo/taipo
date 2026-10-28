@@ -1,0 +1,3 @@
+✘ Test "P2: with learning off, choosing a non-first candidate is neither remembered nor written" recorded an issue at LearningSwitchTests.swift:25:5: Expectation failed: (session.markedText → "音") == "因"
+✘ Test "P2: with learning off, choosing a non-first candidate is neither remembered nor written" recorded an issue at LearningSwitchTests.swift:26:5: Expectation failed: !((FileManager.default → <NSFileManager: 0x102b79020>).fileExists(atPath: url.path → "/var/folders/yt/l_0c2zg96r32wyfdnm81y8zm0000gn/T/taipo-learning-E79E292C-000C-4C09-95AA-804B728F5E91/user.json") → true)
+✘ Test "P2: with learning off, choosing a non-first candidate is neither remembered nor written" failed after 1.578 seconds with 2 issues.

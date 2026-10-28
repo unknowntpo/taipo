@@ -1,0 +1,21 @@
+caught: B4 stagger flipped :: B4: zh-number-row, X3: zh-typo-after-phrase, X3: zh-typo-not-single-letter, X9: every Spec 001 case row still holds with mixed decoding enabled
+caught: B4 no vertical adjacency :: B4: en-cross-row, B4: zh-number-row, X3: zh-typo-after-phrase, X3: zh-typo-not-rare-english
+caught: B4 backtick restored :: B4: zh-number-row, X3: zh-typo-after-phrase, X3: zh-typo-not-single-letter, X9: every Spec 001 case row still holds with mixed decoding enabled
+caught: B4 no missing-key edit :: B4: en-missing-key, X9: every Spec 001 case row still holds with mixed decoding enabled
+caught: B4 no extra-key edit :: B4: en-extra-key, I10: capitalized-learned-choice, X9: every Spec 001 case row still holds with mixed decoding enabled
+caught: F2 max keys counts bytes :: F2: multibyte-max-length, X9: every Spec 001 case row still holds with mixed decoding enabled
+caught: B4 adjacency ignored :: B4: en-non-adjacent, B4: zh-number-row-not-adjacent, I10: capitalized-learned-choice, I16: digits-literal
+caught: B4 budget 3-5 -> 2 :: B4: budget-5-keys-2-edits, B4: en-non-adjacent, I16: digits-literal, I26: uppercase-zhuyin-is-literal
+caught: B4 budget 1-2 -> 1 :: B4: budget-2-keys, I1: partial-syllable, I5: backspace-removes-key, X9: every Spec 001 case row still holds with mixed decoding enabled
+caught: B4 transpose removed :: B4: en-transpose, B5: exact-not-corrected, B6: en-exact-rare, B7: learned choice persists across restart
+caught: B3 phrase lookup disabled (chars only) :: B3: zh-sentence-uses-phrases, X9: every Spec 001 case row still holds with mixed decoding enabled
+caught: B5 exact-first removed :: B5: zh-exact-rare, B6: en-exact-rare, B6: zh-exact-over-en-fuzzy, I11: commitComposition commits the selected candidate and clears
+caught: B6 default zh -> en :: B6: tie-no-hint, I27: backspace-removes-tone-space, I2: space-as-tone1, I7: commit-first-does-not-learn
+caught: B7 learned choice ignored :: B7: learn-lexicon-word, F6: write failure throws but the in-memory choice still applies, I10: capitalized-learned-choice, I22: session keeps working after a failed learn
+caught: B7 user words not added :: B7: user-word-fuzzy, X9: every Spec 001 case row still holds with mixed decoding enabled
+caught: B8 literal not appended :: B4: budget-2-keys, B4: budget-5-keys-2-edits, B4: en-non-adjacent, B7: user-word-control
+caught: F2 max keys 32 -> 31 :: F2: max-length, F2: multibyte-max-length, X9: every Spec 001 case row still holds with mixed decoding enabled
+caught: F3 zh accepts any byte :: F3: non-layout-with-zhuyin, X9: every Spec 001 case row still holds with mixed decoding enabled
+caught: F4 no quarantine :: F4: corrupt user dictionary is quarantined and decoder starts empty
+caught: F6 memory not updated before save :: B7: learn-lexicon-word, F6: write failure throws but the in-memory choice still applies, I10: capitalized-learned-choice, I22: session keeps working after a failed learn
+caught: F8 malformed weight accepted :: 

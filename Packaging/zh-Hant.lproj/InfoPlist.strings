@@ -1,0 +1,4 @@
+"CFBundleName" = "Taipo";
+"CFBundleDisplayName" = "Taipo";
+"com.unknowntpo.inputmethod.Taipo.zhuyin" = "Taipo（注音＋英文）";
+"NSMicrophoneUsageDescription" = "按住右 Command 說話時，Taipo 在本機錄音並辨識成文字；音訊只留在記憶體，不會存檔或上傳。";

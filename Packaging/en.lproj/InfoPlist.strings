@@ -1,0 +1,4 @@
+"CFBundleName" = "Taipo";
+"CFBundleDisplayName" = "Taipo";
+"com.unknowntpo.inputmethod.Taipo.zhuyin" = "Taipo (Zhuyin + English)";
+"NSMicrophoneUsageDescription" = "While you hold right Command, Taipo records on this Mac and turns speech into text. Audio stays in memory; it is never saved or uploaded.";

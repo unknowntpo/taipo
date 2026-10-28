@@ -1,0 +1,208 @@
+# Spec 012 fail-first: swift test --filter VoiceTests against a stub Sources/TaipoIME/Voice.swift (signatures only).
+# 13 of 16 tests fail. The 3 that pass are absence tests (short hold, other key while held, gated); their
+# positive controls (W1 hold inserts, W3 intercepted when available) fail here.
+✘ Test "W1: right Command flag changes map to down / up; with another modifier held it is not a trigger" recorded an issue with 3 arguments keyCode → 54, flags → 256, expected → .rightCommandUp at VoiceTests.swift:194:5: Expectation failed: (RightCommand.event(keyCode: keyCode, flags: flags) → .otherKey) == (expected → .rightCommandUp)
+✘ Test "W1: right Command flag changes map to down / up; with another modifier held it is not a trigger" recorded an issue with 3 arguments keyCode → 54, flags → 1048592, expected → .rightCommandDown at VoiceTests.swift:194:5: Expectation failed: (RightCommand.event(keyCode: keyCode, flags: flags) → .otherKey) == (expected → .rightCommandDown)
+✘ Test "W2: standalone 嗯 / 呃 / 欸 are deleted, words containing them are kept, ends are trimmed" recorded an issue with 2 arguments input → "嗯，這個 API 的 timeout 有點 short", expected → "這個 API 的 timeout 有點 short" at VoiceTests.swift:211:5: Expectation failed: (FillerFilter.clean(input) → "嗯，這個 API 的 timeout 有點 short") == (expected → "這個 API 的 timeout 有點 short")
+✘ Test "W2: standalone 嗯 / 呃 / 欸 are deleted, words containing them are kept, ends are trimmed" recorded an issue with 2 arguments input → "好，欸。", expected → "好。" at VoiceTests.swift:211:5: Expectation failed: (FillerFilter.clean(input) → "好，欸。") == (expected → "好。")
+✘ Test "W6: the recognizer throws: no text, an error line for 2 s, keys work afterwards" recorded an issue at VoiceTests.swift:271:5: Expectation failed: (rig.host.status?.hasPrefix(VoiceSession.errorPrefix) → nil) == true
+✘ Test "W2: standalone 嗯 / 呃 / 欸 are deleted, words containing them are kept, ends are trimmed" recorded an issue with 2 arguments input → "我覺得，呃，可以", expected → "我覺得，可以" at VoiceTests.swift:211:5: Expectation failed: (FillerFilter.clean(input) → "我覺得，呃，可以") == (expected → "我覺得，可以")
+✘ Test "W2: standalone 嗯 / 呃 / 欸 are deleted, words containing them are kept, ends are trimmed" recorded an issue with 2 arguments input → "  這個 API 的 timeout 有點 short  ", expected → "這個 API 的 timeout 有點 short" at VoiceTests.swift:211:5: Expectation failed: (FillerFilter.clean(input) → "  這個 API 的 timeout 有點 short  ") == (expected → "這個 API 的 timeout 有點 short")
+✘ Test "W6: the recognizer throws: no text, an error line for 2 s, keys work afterwards" recorded an issue at VoiceTests.swift:273:5: Expectation failed: (rig.host.status → nil) != nil
+✘ Test "W2: standalone 嗯 / 呃 / 欸 are deleted, words containing them are kept, ends are trimmed" recorded an issue with 2 arguments input → "嗯嗯 好", expected → "好" at VoiceTests.swift:211:5: Expectation failed: (FillerFilter.clean(input) → "嗯嗯 好") == (expected → "好")
+✘ Test "W6: the recognizer throws: no text, an error line for 2 s, keys work afterwards" failed after 0.001 seconds with 2 issues.
+✘ Test "W2: standalone 嗯 / 呃 / 欸 are deleted, words containing them are kept, ends are trimmed" with 8 test cases failed after 0.001 seconds with 5 issues.
+✘ Test "W1: right Command flag changes map to down / up; with another modifier held it is not a trigger" with 6 test cases failed after 0.001 seconds with 2 issues.
+✘ Test "W1: Esc while recording cancels: audio discarded, Esc consumed, nothing inserted" recorded an issue at VoiceTests.swift:135:5: Expectation failed: (rig.session → TaipoIME.VoiceSession).handle(.escape)
+✘ Test "W1: Esc while recording cancels: audio discarded, Esc consumed, nothing inserted" recorded an issue at VoiceTests.swift:136:5: Expectation failed: (rig.recorder.cancelled → 0) == 1
+✘ Test "W1: Esc while recording cancels: audio discarded, Esc consumed, nothing inserted" failed after 0.001 seconds with 2 issues.
+✔ Test "W1: a hold shorter than 0.3 s is a slip: no recording, no recognition, nothing inserted" passed after 0.002 seconds.
+✘ Test "W3: positive control: switch on and model installed, right Command is intercepted" recorded an issue at VoiceTests.swift:241:5: Expectation failed: (rig.session → TaipoIME.VoiceSession).handle(.rightCommandDown)
+✘ Test "W3: positive control: switch on and model installed, right Command is intercepted" recorded an issue at VoiceTests.swift:242:5: Expectation failed: (rig.session.state → .idle) == .armed
+✘ Test "W6: recognition over 10 s times out: no text, error shown, the late result is dropped, keys work" recorded an issue at VoiceTests.swift:287:5: Expectation failed: (rig.host.status → nil) == (VoiceSession.recognizing → "辨識中…")
+✘ Test "W6: recognition over 10 s times out: no text, error shown, the late result is dropped, keys work" recorded an issue at VoiceTests.swift:291:5: Expectation failed: (rig.host.status?.hasPrefix(VoiceSession.errorPrefix) → nil) == true
+✘ Test "W3: positive control: switch on and model installed, right Command is intercepted" failed after 0.002 seconds with 2 issues.
+✘ Test "W6: recognition over 10 s times out: no text, error shown, the late result is dropped, keys work" failed after 0.002 seconds with 2 issues.
+✘ Test "W3: voice is available only when the switch is on and the model file is installed" recorded an issue at VoiceTests.swift:255:5: Expectation failed: !(VoiceSettings.isEnabled(in: defaults → <NSUserDefaults: 0x946c4c090>) → true)
+✘ Test "W3: voice is available only when the switch is on and the model file is installed" recorded an issue at VoiceTests.swift:257:5: Expectation failed: !(VoiceSettings.isAvailable(defaults: (defaults → <NSUserDefaults: 0x946c4c090>), modelURL: (model → file:///var/folders/yt/l_0c2zg96r32wyfdnm81y8zm0000gn/T/taipo-voice-7ACC414D-B096-4BE2-83EF-8F5A717C1DD7/ggml-breeze-asr-25-q5_0.bin)) → true)
+✘ Test "W3: voice is available only when the switch is on and the model file is installed" recorded an issue at VoiceTests.swift:261:5: Expectation failed: !(VoiceSettings.isAvailable(defaults: (defaults → <NSUserDefaults: 0x946c4c090>), modelURL: (model → file:///var/folders/yt/l_0c2zg96r32wyfdnm81y8zm0000gn/T/taipo-voice-7ACC414D-B096-4BE2-83EF-8F5A717C1DD7/ggml-breeze-asr-25-q5_0.bin)) → true)
+✘ Test "W3: voice is available only when the switch is on and the model file is installed" failed after 0.008 seconds with 3 issues.
+✘ Test "W1: holding right Command ≥ 0.3 s records, shows 聆聽中 then 辨識中, and inserts the result on release" recorded an issue at VoiceTests.swift:110:5: Expectation failed: (rig.recorder → TaipoIMETests.FakeRecorder).isRunning → false
+✘ Test "W1: holding right Command ≥ 0.3 s records, shows 聆聽中 then 辨識中, and inserts the result on release" recorded an issue at VoiceTests.swift:111:5: Expectation failed: (rig.host.status → nil) == (VoiceSession.listening → "🎙 聆聽中…")
+✘ Test "W1: holding right Command ≥ 0.3 s records, shows 聆聽中 then 辨識中, and inserts the result on release" recorded an issue at VoiceTests.swift:113:5: Expectation failed: (rig.host.status → nil) == (VoiceSession.recognizing → "辨識中…")
+✘ Test "W1: holding right Command ≥ 0.3 s records, shows 聆聽中 then 辨識中, and inserts the result on release" recorded an issue at VoiceTests.swift:115:5: Expectation failed: (rig.host.inserted → []) == ["這個 API 的 timeout 有點 short"]
+✘ Test "W6: the microphone cannot start (denied): error shown, nothing recognized, keys work" recorded an issue at VoiceTests.swift:304:5: Expectation failed: (rig.host.status?.hasPrefix(VoiceSession.errorPrefix) → nil) == true
+✘ Test "W1: holding right Command ≥ 0.3 s records, shows 聆聽中 then 辨識中, and inserts the result on release" failed after 0.011 seconds with 4 issues.
+✘ Test "W6: the microphone cannot start (denied): error shown, nothing recognized, keys work" failed after 0.010 seconds with 1 issue.
+✔ Test "W1: another key while right Command is held (⌘C) discards the audio and passes the key to the app" passed after 0.010 seconds.
+✘ Test "W6: positive control: after a failure, the next successful recognition inserts its text" recorded an issue at VoiceTests.swift:317:5: Expectation failed: (rig.host.inserted → []) == ["好"]
+✘ Test "W6: positive control: after a failure, the next successful recognition inserts its text" failed after 0.011 seconds with 1 issue.
+✘ Test "W1: right Command while composing commits the composition before recording starts" recorded an issue at VoiceTests.swift:165:5: Expectation failed: (Array(rig.host.log.prefix(2)) → []) == (["commit", "status:\(VoiceSession.listening)"] → ["commit", "status:🎙 聆聽中…"])
+✘ Test "W1: right Command while composing commits the composition before recording starts" failed after 0.011 seconds with 1 issue.
+✘ Test "W2: a result that is only fillers or blank sends nothing and clears the composition area" recorded an issue with 1 argument text → "   " at VoiceTests.swift:219:5: Expectation failed: (rig.recognizer.calls → 0) == 1
+✔ Test "W3: with the switch off or the model missing, right Command is not intercepted" passed after 0.011 seconds.
+✘ Test "W2: a result that is only fillers or blank sends nothing and clears the composition area" recorded an issue with 1 argument text → "嗯" at VoiceTests.swift:219:5: Expectation failed: (rig.recognizer.calls → 0) == 1
+✘ Test "W2: a result that is only fillers or blank sends nothing and clears the composition area" recorded an issue with 1 argument text → " 呃。 " at VoiceTests.swift:219:5: Expectation failed: (rig.recognizer.calls → 0) == 1
+✘ Test "W2: a result that is only fillers or blank sends nothing and clears the composition area" recorded an issue with 1 argument text → "" at VoiceTests.swift:219:5: Expectation failed: (rig.recognizer.calls → 0) == 1
+✘ Test "W2: a result that is only fillers or blank sends nothing and clears the composition area" with 4 test cases failed after 0.011 seconds with 4 issues.
+✘ Test "W1: recording stops by itself at 60 s and is recognized; the later release does nothing" recorded an issue at VoiceTests.swift:173:5: Expectation failed: (rig.recorder → TaipoIMETests.FakeRecorder).isRunning → false
+✘ Test "W1: recording stops by itself at 60 s and is recognized; the later release does nothing" recorded an issue at VoiceTests.swift:175:5: Expectation failed: (rig.recorder.stopped → 0) == 1
+✘ Test "W1: recording stops by itself at 60 s and is recognized; the later release does nothing" recorded an issue at VoiceTests.swift:177:5: Expectation failed: (rig.host.inserted.count → 0) == 1
+✘ Test "W1: recording stops by itself at 60 s and is recognized; the later release does nothing" recorded an issue at VoiceTests.swift:180:5: Expectation failed: (rig.recognizer.calls → 0) == 1
+✘ Test "W1: recording stops by itself at 60 s and is recognized; the later release does nothing" recorded an issue at VoiceTests.swift:181:5: Expectation failed: (rig.host.inserted.count → 0) == 1
+✘ Test "W1: recording stops by itself at 60 s and is recognized; the later release does nothing" failed after 0.019 seconds with 5 issues.
+✘ Test run with 16 tests in 0 suites failed after 0.019 seconds with 34 issues.
+
+# 2026-10-26 floating bar (W11–W13): swift test --filter VoiceTests with VoiceHost.showVoiceBar in place of
+# showVoiceStatus and a stub VoiceSession that never shows the bar (updateLevel / finish no-ops, AudioLevel 0,
+# LevelThrottle always true). 11 of 25 tests fail. Passing W11–W13 tests: "✕ while recording" (the existing
+# cancel() already stopped the microphone; the bar is hidden by default) and "✓ when not recording" (absence test;
+# its positive control "✓ while recording" fails here).
+✘ Test "W13: level updates are throttled to at most 30 per second" recorded an issue at VoiceTests.swift:479:5: Expectation failed: (allowed → [true, true, true, true]) == [true, false, true, false]
+✘ Test "W13: level is RMS in dBFS mapped linearly from -50 dB (0) to -10 dB (1), clamped" recorded an issue with 2 arguments samples → [0.01, -0.01], expected → 0.25 at VoiceTests.swift:471:5: Expectation failed: (abs(Double(AudioLevel.level(of: samples)) - expected) → 0.25) < 0.005
+✘ Test "W13: level is RMS in dBFS mapped linearly from -50 dB (0) to -10 dB (1), clamped" recorded an issue with 2 arguments samples → [0.0035], expected → 0.022 at VoiceTests.swift:471:5: Expectation failed: (abs(Double(AudioLevel.level(of: samples)) - expected) → 0.022) < 0.005
+✘ Test "W13: level is RMS in dBFS mapped linearly from -50 dB (0) to -10 dB (1), clamped" recorded an issue with 2 arguments samples → [0.3], expected → 0.988 at VoiceTests.swift:471:5: Expectation failed: (abs(Double(AudioLevel.level(of: samples)) - expected) → 0.988) < 0.005
+✘ Test "W13: level is RMS in dBFS mapped linearly from -50 dB (0) to -10 dB (1), clamped" recorded an issue with 2 arguments samples → [0.1], expected → 0.75 at VoiceTests.swift:471:5: Expectation failed: (abs(Double(AudioLevel.level(of: samples)) - expected) → 0.75) < 0.005
+✘ Test "W13: level is RMS in dBFS mapped linearly from -50 dB (0) to -10 dB (1), clamped" recorded an issue with 2 arguments samples → [1.0, -1.0], expected → 1.0 at VoiceTests.swift:471:5: Expectation failed: (abs(Double(AudioLevel.level(of: samples)) - expected) → 1.0) < 0.005
+✘ Test "W13: level updates are throttled to at most 30 per second" failed after 0.002 seconds with 1 issue.
+✘ Test "W13: level is RMS in dBFS mapped linearly from -50 dB (0) to -10 dB (1), clamped" recorded an issue with 2 arguments samples → [0.32], expected → 1.0 at VoiceTests.swift:471:5: Expectation failed: (abs(Double(AudioLevel.level(of: samples)) - expected) → 1.0) < 0.005
+✘ Test "W13: level is RMS in dBFS mapped linearly from -50 dB (0) to -10 dB (1), clamped" with 9 test cases failed after 0.002 seconds with 6 issues.
+✘ Test "W12: ✓ while recording stops now and recognizes; the later right Shift release does nothing" recorded an issue at VoiceTests.swift:430:5: Expectation failed: (rig.session → TaipoIME.VoiceSession).finish()
+✘ Test "W12: ✓ while recording stops now and recognizes; the later right Shift release does nothing" recorded an issue at VoiceTests.swift:431:5: Expectation failed: (rig.recorder.stopped → 0) == 1
+✘ Test "W12: ✓ while recording stops now and recognizes; the later right Shift release does nothing" recorded an issue at VoiceTests.swift:432:5: Expectation failed: (rig.host.bar → .hidden) == .recognizing
+✘ Test "W12: ✓ while recording stops now and recognizes; the later right Shift release does nothing" recorded an issue at VoiceTests.swift:434:5: Expectation failed: (rig.host.inserted → []) == ["這個 API 的 timeout 有點 short"]
+✘ Test "W12: ✕ while recognizing drops the result: nothing inserted, bar hidden" recorded an issue at VoiceTests.swift:416:5: Expectation failed: (rig.host.bar → .hidden) == .recognizing
+✘ Test "W6: the microphone cannot start (denied): error shown, nothing recognized, keys work" recorded an issue at VoiceTests.swift:341:5: Expectation failed: (rig.host → TaipoIMETests.FakeHost).showsError → false
+✘ Test "W6: the microphone cannot start (denied): error shown, nothing recognized, keys work" failed after 0.014 seconds with 1 issue.
+✘ Test "W11: microphone level updates the bar only while recording" recorded an issue at VoiceTests.swift:383:5: Expectation failed: (rig.host.bar → .hidden) == .listening(level: 0.5)
+✘ Test "W11: microphone level updates the bar only while recording" recorded an issue at VoiceTests.swift:386:5: Expectation failed: (rig.host.bar → .hidden) == .recognizing
+✘ Test "W11: the bar follows the session: listening while recording, recognizing after release, hidden before the insert" recorded an issue at VoiceTests.swift:366:5: Expectation failed: (rig.host.bar → .hidden) == (.listening(level: 0) → .listening(level: 0.0))
+✘ Test "W11: the bar follows the session: listening while recording, recognizing after release, hidden before the insert" recorded an issue at VoiceTests.swift:368:5: Expectation failed: (rig.host.bar → .hidden) == .recognizing
+✘ Test "W6: recognition over 10 s times out: no text, error shown, the late result is dropped, keys work" recorded an issue at VoiceTests.swift:324:5: Expectation failed: (rig.host.bar → .hidden) == .recognizing
+✘ Test "W12: ✓ while recording stops now and recognizes; the later right Shift release does nothing" failed after 0.015 seconds with 4 issues.
+✘ Test "W12: ✕ while recognizing drops the result: nothing inserted, bar hidden" failed after 0.015 seconds with 1 issue.
+✘ Test "W1: right Shift while composing commits the composition before recording starts" recorded an issue at VoiceTests.swift:178:5: Expectation failed: (Array(rig.host.log.prefix(2)) → ["commit", "commit"]) == ["commit", "bar:listening"]
+✘ Test "W1: right Shift while composing commits the composition before recording starts" failed after 0.016 seconds with 1 issue.
+✘ Test "W11: microphone level updates the bar only while recording" recorded an issue at VoiceTests.swift:390:5: Expectation failed: (rig.host.levels → []) == ([0, 0.5] → [0.0, 0.5])
+✘ Test "W11: microphone level updates the bar only while recording" failed after 0.016 seconds with 3 issues.
+✘ Test "W11: the bar follows the session: listening while recording, recognizing after release, hidden before the insert" recorded an issue at VoiceTests.swift:370:5: Expectation failed: (rig.host.log → ["commit", "commit", "insert:這個 API 的 timeout 有點 short"]) == (["commit", "bar:listening", "bar:recognizing", "bar:hidden", "commit",
+✘ Test "W11: the bar follows the session: listening while recording, recognizing after release, hidden before the insert" failed after 0.016 seconds with 3 issues.
+✘ Test "W6: the recognizer throws: no text, an error line for 2 s, keys work afterwards" recorded an issue at VoiceTests.swift:307:5: Expectation failed: (rig.host → TaipoIMETests.FakeHost).showsError → false
+✘ Test "W6: the recognizer throws: no text, an error line for 2 s, keys work afterwards" recorded an issue at VoiceTests.swift:309:5: Expectation failed: (rig.host → TaipoIMETests.FakeHost).showsError → false
+✘ Test "W6: the recognizer throws: no text, an error line for 2 s, keys work afterwards" failed after 0.016 seconds with 2 issues.
+✘ Test "W6: recognition over 10 s times out: no text, error shown, the late result is dropped, keys work" recorded an issue at VoiceTests.swift:328:5: Expectation failed: (rig.host → TaipoIMETests.FakeHost).showsError → false
+✘ Test "W6: recognition over 10 s times out: no text, error shown, the late result is dropped, keys work" failed after 0.016 seconds with 2 issues.
+✘ Test run with 25 tests in 0 suites failed after 0.017 seconds with 24 issues.
+
+# 2026-10-26 mutations on Sources/TaipoIME/Voice.swift (swift test --filter VoiceTests), all caught:
+# updateLevel shows the level outside recording (guard state != .idle) → W11 level test fails
+# finish() acts when armed instead of recording → 2 W12 tests fail
+# AudioLevel ceiling -20 dB instead of -10 dB → W13 level test fails
+# LevelThrottle interval halved (60 Hz) → W13 throttle test fails
+# no .recognizing bar after release → 4 W11/W12 tests fail
+
+## 2026-10-26 W1 duplicated trigger events (Claude Desktop)
+FAIL-FIRST: ✘ Test "W1: Electron apps deliver each right-Shift flagsChanged twice; the repeat changes nothing" recorded an issue at VoiceTests.swift:141:5: Expectation failed: (rig.recorder → TaipoIMETests.FakeRecorder).isRunning → false
+FAIL-FIRST: ✘ Test "W1: Electron apps deliver each right-Shift flagsChanged twice; the repeat changes nothing" recorded an issue at VoiceTests.swift:145:5: Expectation failed: (rig.host.inserted → []) == ["這個 API 的 timeout 有點 short"]
+FAIL-FIRST: ✘ Test "W1: Electron apps deliver each right-Shift flagsChanged twice; the repeat changes nothing" failed after 0.018 seconds with 4 issues.
+FAIL-FIRST: ✘ Test run with 1 test in 0 suites failed after 0.018 seconds with 4 issues.
+
+## 2026-10-26 W11–W13, W16–W18: arming, band levels, smoothing, fade (stubs in Voice.swift; swift test --filter VoiceTests)
+FAIL-FIRST: ✘ Test "W13: each inner band blends 15% of each neighbour; the end bands are kept" recorded an issue at VoiceTests.swift:497:5: Expectation failed: (VoiceSpectrum.blend([0, 0, 0, 1, 0, 0, 0, 0, 0]) → [0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0]) == ([0, 0, 0.15, 0.7, 0.15, 0, 0, 0, 0] → [0.0, 0.0, 0.15, 0.7, 0.15, 0.0, 0.0, 0.0, 0.0])
+FAIL-FIRST: ✘ Test "W13: each inner band blends 15% of each neighbour; the end bands are kept" recorded an issue at VoiceTests.swift:498:5: Expectation failed: (VoiceSpectrum.blend([1, 0, 0, 0, 0, 0, 0, 0, 1]) → [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0]) == ([1, 0.15, 0, 0, 0, 0, 0, 0.15, 1] → [1.0, 0.15, 0.0, 0.0, 0.0, 0.0, 0.0, 0.15, 1.0])
+FAIL-FIRST: ✘ Test "W13: dB maps from -68 (0) to -30 (1), ×1.3 then ^0.7, clamped to 0…1" recorded an issue with 2 arguments db → -67.5, expected → 0.058 at VoiceTests.swift:492:5: Expectation failed: (abs(VoiceSpectrum.level(db: db) - expected) → 0.058) < 0.001
+FAIL-FIRST: ✘ Test "W13: dB maps from -68 (0) to -30 (1), ×1.3 then ^0.7, clamped to 0…1" recorded an issue with 2 arguments db → -49.0, expected → 0.7397 at VoiceTests.swift:492:5: Expectation failed: (abs(VoiceSpectrum.level(db: db) - expected) → 0.7397) < 0.001
+FAIL-FIRST: ✘ Test "W13: dB maps from -68 (0) to -30 (1), ×1.3 then ^0.7, clamped to 0…1" recorded an issue with 2 arguments db → -39.5, expected → 0.9824 at VoiceTests.swift:492:5: Expectation failed: (abs(VoiceSpectrum.level(db: db) - expected) → 0.9824) < 0.001
+FAIL-FIRST: ✘ Test "W13: dB maps from -68 (0) to -30 (1), ×1.3 then ^0.7, clamped to 0…1" recorded an issue with 2 arguments db → -20.0, expected → 1.0 at VoiceTests.swift:492:5: Expectation failed: (abs(VoiceSpectrum.level(db: db) - expected) → 1.0) < 0.001
+FAIL-FIRST: ✘ Test "W18: a hide that finishes fading after a new show does not hide the new bar" recorded an issue at VoiceTests.swift:561:5: Expectation failed: !(orders → <not evaluated>)
+FAIL-FIRST: ✘ Test "W17: levels are smoothed as previous × 0.7 + new × 0.3, per band" recorded an issue at VoiceTests.swift:531:5: Expectation failed: close((first → [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]), (bands(0.3) → [0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3]))
+FAIL-FIRST: ✘ Test "W13: dB maps from -68 (0) to -30 (1), ×1.3 then ^0.7, clamped to 0…1" recorded an issue with 2 arguments db → -38.0, expected → 1.0 at VoiceTests.swift:492:5: Expectation failed: (abs(VoiceSpectrum.level(db: db) - expected) → 1.0) < 0.001
+FAIL-FIRST: ✘ Test "W13: a frame is produced only once 512 samples have arrived" recorded an issue at VoiceTests.swift:473:5: Expectation failed: (complete → nil) != nil
+FAIL-FIRST: ✘ Test "W13: a sine puts its energy in the band that holds its frequency; bands two or more away stay near 0" recorded an issue with 2 arguments hz → 500.0, band → 1 at VoiceTests.swift:482:22: Expectation failed: frame → nil
+FAIL-FIRST: ✘ Test "W18: positive control: a hide with no later show orders the panel out; the newest of two hides wins" recorded an issue at VoiceTests.swift:571:5: Expectation failed: !((fade → BarFade()).shouldOrderOut(first → 0) → true)
+FAIL-FIRST: ✘ Test "W17: levels are smoothed as previous × 0.7 + new × 0.3, per band" recorded an issue at VoiceTests.swift:532:5: Expectation failed: close((second → [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]), (bands(0.51) → [0.51, 0.51, 0.51, 0.51, 0.51, 0.51, 0.51, 0.51, 0.51]))
+FAIL-FIRST: ✘ Test "W17: levels are smoothed as previous × 0.7 + new × 0.3, per band" recorded an issue at VoiceTests.swift:533:5: Expectation failed: close((third → [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]), (bands(0.357) → [0.357, 0.357, 0.357, 0.357, 0.357, 0.357, 0.357, 0.357, 0.357]))
+FAIL-FIRST: ✘ Test "W13: silence gives 0 in every band" recorded an issue at VoiceTests.swift:463:5: Expectation failed: (levels → nil) == (bands(0) → [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
+FAIL-FIRST: ✘ Test "W13: a sine puts its energy in the band that holds its frequency; bands two or more away stay near 0" recorded an issue with 2 arguments hz → 3000.0, band → 7 at VoiceTests.swift:482:22: Expectation failed: frame → nil
+FAIL-FIRST: ✘ Test "W13: each inner band blends 15% of each neighbour; the end bands are kept" failed after 0.002 seconds with 2 issues.
+FAIL-FIRST: ✘ Test "W13: dB maps from -68 (0) to -30 (1), ×1.3 then ^0.7, clamped to 0…1" with 7 test cases failed after 0.002 seconds with 5 issues.
+FAIL-FIRST: ✘ Test "W18: a hide that finishes fading after a new show does not hide the new bar" failed after 0.002 seconds with 1 issue.
+FAIL-FIRST: ✘ Test "W13: a frame is produced only once 512 samples have arrived" failed after 0.002 seconds with 1 issue.
+FAIL-FIRST: ✘ Test "W18: positive control: a hide with no later show orders the panel out; the newest of two hides wins" failed after 0.001 seconds with 1 issue.
+FAIL-FIRST: ✘ Test "W13: silence gives 0 in every band" failed after 0.002 seconds with 1 issue.
+FAIL-FIRST: ✘ Test "W17: levels are smoothed as previous × 0.7 + new × 0.3, per band" failed after 0.002 seconds with 3 issues.
+FAIL-FIRST: ✘ Test "W13: a sine puts its energy in the band that holds its frequency; bands two or more away stay near 0" recorded an issue with 2 arguments hz → 1000.0, band → 3 at VoiceTests.swift:482:22: Expectation failed: frame → nil
+FAIL-FIRST: ✘ Test "W13: a sine puts its energy in the band that holds its frequency; bands two or more away stay near 0" with 3 test cases failed after 0.002 seconds with 3 issues.
+FAIL-FIRST: ✘ Test "W17: each recording starts smoothing from 0" recorded an issue at VoiceTests.swift:543:5: Expectation failed: (rig.host.bar → .listening(levels: [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0])).isListening(bands(0.51) → [0.51, 0.51, 0.51, 0.51, 0.51, 0.51, 0.51, 0.51, 0.51])
+FAIL-FIRST: ✘ Test "W11: the bar follows the session: arming once recording starts, recognizing after release, hidden before the insert" recorded an issue at VoiceTests.swift:382:5: Expectation failed: (rig.host.bar → .listening(levels: [])) == .arming
+FAIL-FIRST: ✘ Test "W16: the bar shows arming from the start of recording until the first microphone levels arrive" recorded an issue at VoiceTests.swift:516:5: Expectation failed: (rig.host.bar → .listening(levels: [])) == .arming
+FAIL-FIRST: ✘ Test "W16: the bar shows arming from the start of recording until the first microphone levels arrive" recorded an issue at VoiceTests.swift:518:5: Expectation failed: (rig.host.bar → .listening(levels: [])) == .arming
+FAIL-FIRST: ✘ Test "W16: the bar shows arming from the start of recording until the first microphone levels arrive" recorded an issue at VoiceTests.swift:520:5: Expectation failed: (rig.host.bar → .listening(levels: [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5])).isListening(bands(0.15) → [0.15, 0.15, 0.15, 0.15, 0.15, 0.15, 0.15, 0.15, 0.15])
+FAIL-FIRST: ✘ Test "W16: the bar shows arming from the start of recording until the first microphone levels arrive" recorded an issue at VoiceTests.swift:521:5: Expectation failed: (rig.host.log → ["commit", "bar:listening"]) == ["commit", "bar:arming", "bar:listening"]
+FAIL-FIRST: ✘ Test "W16: the bar shows arming from the start of recording until the first microphone levels arrive" failed after 0.006 seconds with 4 issues.
+FAIL-FIRST: ✘ Test "W11: microphone levels update the bar only while recording" recorded an issue at VoiceTests.swift:399:5: Expectation failed: (rig.host.bar → .listening(levels: [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0])).isListening(bands(0.3) → [0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3])
+FAIL-FIRST: ✘ Test "W17: each recording starts smoothing from 0" recorded an issue at VoiceTests.swift:548:5: Expectation failed: (rig.host.bar → .listening(levels: [])) == .arming
+FAIL-FIRST: ✘ Test "W17: each recording starts smoothing from 0" recorded an issue at VoiceTests.swift:550:5: Expectation failed: (rig.host.bar → .listening(levels: [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0])).isListening(bands(0.3) → [0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3])
+FAIL-FIRST: ✘ Test "W17: each recording starts smoothing from 0" failed after 0.007 seconds with 3 issues.
+FAIL-FIRST: ✘ Test "W11: the bar follows the session: arming once recording starts, recognizing after release, hidden before the insert" recorded an issue at VoiceTests.swift:386:5: Expectation failed: (rig.host.log → ["commit", "bar:listening", "bar:recognizing", "bar:hidden", "commit", "insert:這個 API 的 timeout 有點 short"]) == (["commit", "bar:arming", "bar:recognizing", "bar:hidden", "commit",
+FAIL-FIRST: ✘ Test "W11: microphone levels update the bar only while recording" recorded an issue at VoiceTests.swift:406:5: Expectation failed: (rig.host.levels.count → 2) == 1
+FAIL-FIRST: ✘ Test "W11: the bar follows the session: arming once recording starts, recognizing after release, hidden before the insert" failed after 0.007 seconds with 2 issues.
+FAIL-FIRST: ✘ Test "W11: microphone levels update the bar only while recording" failed after 0.007 seconds with 2 issues.
+FAIL-FIRST: ✘ Test run with 33 tests in 0 suites failed after 0.007 seconds with 29 issues.
+
+## 2026-10-26 W20–W24: hands-free toggle (tap starts, tap stops); before the change in VoiceSession.handle (swift test --filter VoiceTests)
+FAIL-FIRST: ✘ Test "W24: Esc during hands-free recording cancels: audio discarded, Esc consumed, nothing inserted" recorded an issue at VoiceTests.swift:655:5: Expectation failed: (rig.session → TaipoIME.VoiceSession).handle(.escape)
+FAIL-FIRST: ✘ Test "W24: Esc during hands-free recording cancels: audio discarded, Esc consumed, nothing inserted" recorded an issue at VoiceTests.swift:656:5: Expectation failed: (rig.recorder.cancelled → 0) == 1
+FAIL-FIRST: ✘ Test "W23: another key during hands-free recording discards the audio and passes the key to the app" recorded an issue at VoiceTests.swift:639:9: Expectation failed: (rig.recorder.cancelled → 0) == 1
+FAIL-FIRST: ✘ Test "W23: another key during hands-free recording discards the audio and passes the key to the app" recorded an issue at VoiceTests.swift:646:9: Expectation failed: (rig.recorder.started → 0) == 1
+FAIL-FIRST: ✘ Test "W24: Esc during hands-free recording cancels: audio discarded, Esc consumed, nothing inserted" failed after 0.013 seconds with 2 issues.
+FAIL-FIRST: ✘ Test "W23: another key during hands-free recording discards the audio and passes the key to the app" recorded an issue at VoiceTests.swift:639:9: Expectation failed: (rig.recorder.cancelled → 0) == 1
+FAIL-FIRST: ✘ Test "W23: another key during hands-free recording discards the audio and passes the key to the app" recorded an issue at VoiceTests.swift:646:9: Expectation failed: (rig.recorder.started → 0) == 1
+FAIL-FIRST: ✘ Test "W23: another key during hands-free recording discards the audio and passes the key to the app" failed after 0.013 seconds with 4 issues.
+FAIL-FIRST: ✘ Test "W21: a second lone tap stops and recognizes; the text is inserted" recorded an issue at VoiceTests.swift:594:5: Expectation failed: (rig.recorder → TaipoIMETests.FakeRecorder).isRunning → false
+FAIL-FIRST: ✘ Test "W21: a second lone tap stops and recognizes; the text is inserted" recorded an issue at VoiceTests.swift:597:5: Expectation failed: (rig.recorder.stopped → 0) == 1
+FAIL-FIRST: ✘ Test "W21: a second lone tap stops and recognizes; the text is inserted" recorded an issue at VoiceTests.swift:598:5: Expectation failed: (rig.host.bar → .hidden) == .recognizing
+FAIL-FIRST: ✘ Test "W21: a second lone tap stops and recognizes; the text is inserted" recorded an issue at VoiceTests.swift:600:5: Expectation failed: (rig.host.inserted → []) == ["這個 API 的 timeout 有點 short"]
+FAIL-FIRST: ✘ Test "W24: ✕ during hands-free recording cancels; the next tap starts a new recording" recorded an issue at VoiceTests.swift:670:5: Expectation failed: (rig.recorder.cancelled → 0) == 1
+FAIL-FIRST: ✘ Test "W24: ✕ during hands-free recording cancels; the next tap starts a new recording" recorded an issue at VoiceTests.swift:674:5: Expectation failed: (rig.recorder.started → 0) == 2
+FAIL-FIRST: ✘ Test "W21: a second lone tap stops and recognizes; the text is inserted" failed after 0.026 seconds with 4 issues.
+FAIL-FIRST: ✘ Test "W24: ✕ during hands-free recording cancels; the next tap starts a new recording" failed after 0.026 seconds with 2 issues.
+FAIL-FIRST: ✘ Test "W21: hands-free recording stops by itself at 60 s and is recognized" recorded an issue at VoiceTests.swift:609:5: Expectation failed: (rig.recorder → TaipoIMETests.FakeRecorder).isRunning → false
+FAIL-FIRST: ✘ Test "W21: hands-free recording stops by itself at 60 s and is recognized" recorded an issue at VoiceTests.swift:611:5: Expectation failed: (rig.recorder.stopped → 0) == 1
+FAIL-FIRST: ✘ Test "W21: hands-free recording stops by itself at 60 s and is recognized" recorded an issue at VoiceTests.swift:613:5: Expectation failed: (rig.host.inserted.count → 0) == 1
+FAIL-FIRST: ✘ Test "W21: hands-free recording stops by itself at 60 s and is recognized" failed after 0.036 seconds with 3 issues.
+FAIL-FIRST: ✘ Test "W22: duplicated events (down, down, up, up) count as one tap, both to start and to stop" recorded an issue at VoiceTests.swift:620:5: Expectation failed: (rig.session.state → .idle) == .recording
+FAIL-FIRST: ✘ Test "W22: duplicated events (down, down, up, up) count as one tap, both to start and to stop" recorded an issue at VoiceTests.swift:621:5: Expectation failed: (rig.recorder.started → 0) == 1
+FAIL-FIRST: ✘ Test "W22: duplicated events (down, down, up, up) count as one tap, both to start and to stop" recorded an issue at VoiceTests.swift:625:5: Expectation failed: (rig.recorder.started → 0) == 1
+FAIL-FIRST: ✘ Test "W22: duplicated events (down, down, up, up) count as one tap, both to start and to stop" recorded an issue at VoiceTests.swift:626:5: Expectation failed: (rig.recorder.stopped → 0) == 1
+FAIL-FIRST: ✘ Test "W22: duplicated events (down, down, up, up) count as one tap, both to start and to stop" recorded an issue at VoiceTests.swift:627:5: Expectation failed: (rig.host.inserted → []) == ["這個 API 的 timeout 有點 short"]
+FAIL-FIRST: ✘ Test "W22: duplicated events (down, down, up, up) count as one tap, both to start and to stop" failed after 0.036 seconds with 5 issues.
+FAIL-FIRST: ✘ Test "W20: a lone right-Shift tap starts hands-free recording and shows the bar; releasing does not stop it" recorded an issue at VoiceTests.swift:580:5: Expectation failed: (rig.session.state → .idle) == .recording
+FAIL-FIRST: ✘ Test "W20: a lone right-Shift tap starts hands-free recording and shows the bar; releasing does not stop it" recorded an issue at VoiceTests.swift:581:5: Expectation failed: (rig.recorder → TaipoIMETests.FakeRecorder).isRunning → false
+FAIL-FIRST: ✘ Test "W20: a lone right-Shift tap starts hands-free recording and shows the bar; releasing does not stop it" recorded an issue at VoiceTests.swift:582:5: Expectation failed: (rig.host.bar → .hidden) == .arming
+FAIL-FIRST: ✘ Test "W20: a lone right-Shift tap starts hands-free recording and shows the bar; releasing does not stop it" recorded an issue at VoiceTests.swift:584:5: Expectation failed: (rig.recorder → TaipoIMETests.FakeRecorder).isRunning → false
+FAIL-FIRST: ✘ Test "W20: a lone right-Shift tap starts hands-free recording and shows the bar; releasing does not stop it" failed after 0.052 seconds with 4 issues.
+FAIL-FIRST: ✘ Test run with 39 tests in 0 suites failed after 0.057 seconds with 24 issues.
+
+# 2026-10-26 mutations on Sources/TaipoIME/Voice.swift (swift test --filter VoiceTests), all caught:
+# tap resets like a slip → caught by W20, W21, W22, W23, W24
+# hands-free stops on any release → caught by W22
+# stopping press ignored → caught by W21, W22
+# smoother keeps 0.5 → caught by W11, W16, W17
+# fade always orders out → caught by W18
+# blend 10% neighbours → caught by W13
+# bands linear spacing → caught by W13
+# gain 1.0 → caught by W13
+# no arming bar → caught by W1, W11, W16, W17, W20
+# smoother not reset per recording → caught by W17
+
+## 2026-10-27 W25: the bar is never left transparent; BarFade with the old rules (a show while marked shown only resizes; a stale fade-out does nothing) (swift test --filter fade)
+FAIL-FIRST: ✔ Test "W18: positive control: a hide with no later show orders the panel out; the newest of two hides wins" passed after 0.001 seconds.
+FAIL-FIRST: ✔ Test "W25: positive control: a show while the bar is on screen and opaque only updates it; a second hide does nothing" passed after 0.001 seconds.
+FAIL-FIRST: ✔ Test "W18: a hide that finishes fading after a new show does not hide the new bar" passed after 0.001 seconds.
+FAIL-FIRST: ✘ Test "W25: hide, then show during the fade-out: the show fades in and the ending fade-out restores the bar" recorded an issue at VoiceTests.swift:579:5: Expectation failed: (fade.fadeOutEnded(hide) → .ignore) == .restore
+FAIL-FIRST: ✘ Test "W25: a show while the bar is marked shown but transparent or ordered out fades it in again" recorded an issue at VoiceTests.swift:589:5: Expectation failed: (transparent → .keep) == .fadeIn
+FAIL-FIRST: ✘ Test "W25: a show while the bar is marked shown but transparent or ordered out fades it in again" recorded an issue at VoiceTests.swift:590:5: Expectation failed: (orderedOut → .keep) == .fadeIn
+FAIL-FIRST: ✘ Test "W25: hide, then show during the fade-out: the show fades in and the ending fade-out restores the bar" failed after 0.001 seconds with 1 issue.
+FAIL-FIRST: ✘ Test "W25: a show while the bar is marked shown but transparent or ordered out fades it in again" failed after 0.001 seconds with 2 issues.
+FAIL-FIRST: ✘ Test run with 5 tests in 0 suites failed after 0.001 seconds with 3 issues.

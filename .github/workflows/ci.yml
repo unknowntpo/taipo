@@ -1,0 +1,33 @@
+name: ci
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  core:
+    # GitHub-hosted macOS 26 (arm64); its default Xcode 26 provides Swift 6.2 (Package.swift tools version).
+    runs-on: macos-26
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - run: swift --version
+      - name: Unit tests
+        run: swift test
+      - name: Traceability
+        run: swift run taipo-dev check-traceability
+      - name: Test plan up to date
+        run: swift run taipo-dev render-test-plan --check
+      - name: Budgets (M1–M3)
+        run: swift run -c release taipo-bench
+      # xcodebuild compiles MLX and its Metal shaders (~10 min), so only on demand.
+      - name: Build input method bundle
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          xcodebuild -downloadComponent MetalToolchain
+          scripts/install-ime.sh --build

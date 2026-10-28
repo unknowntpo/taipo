@@ -1,0 +1,2 @@
+1700 single-adjacent-key Zhuyin typos vs 41f4309 (pre-Spec 003): top-1 changed 1
+w8 apt	他們 -> 他 apt

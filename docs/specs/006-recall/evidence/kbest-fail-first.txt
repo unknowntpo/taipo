@@ -1,0 +1,3 @@
+◇ Test run started.
+✘ Test recallCase(_:) recorded an issue with 1 argument c → R3: two-phrases-runner-up-path at DecoderCaseTests.swift:57:40: Expectation failed: (top3 → ["一場羅", "一場活", "u t;3xjig6"]).contains(word → "一場落實")
+✘ Test recallCase(_:) recorded an issue with 1 argument c → R3: two-phrases-runner-up-path-2 at DecoderCaseTests.swift:57:40: Expectation failed: (top3 → ["個的事實上", "個的事實是;", "可的事實上"]).contains(word → "各地事實上")

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleDevelopmentRegion</key><string>zh_TW</string>
+	<key>CFBundleExecutable</key><string>Taipo</string>
+	<key>CFBundleIdentifier</key><string>com.unknowntpo.inputmethod.Taipo</string>
+	<key>CFBundleName</key><string>Taipo</string>
+	<key>CFBundleDisplayName</key><string>Taipo</string>
+	<key>CFBundlePackageType</key><string>APPL</string>
+	<key>CFBundleShortVersionString</key><string>0.1.0</string>
+	<key>CFBundleVersion</key><string>1</string>
+	<key>LSMinimumSystemVersion</key><string>14.0</string>
+	<key>LSBackgroundOnly</key><true/>
+	<key>NSPrincipalClass</key><string>NSApplication</string>
+	<key>NSMicrophoneUsageDescription</key><string>按住右 Command 說話時，Taipo 在本機錄音並辨識成文字；音訊只留在記憶體，不會存檔或上傳。</string>
+	<key>InputMethodConnectionName</key><string>com.unknowntpo.inputmethod.Taipo_Connection</string>
+	<key>InputMethodServerControllerClass</key><string>TaipoInputController</string>
+	<key>TISInputSourceID</key><string>com.unknowntpo.inputmethod.Taipo</string>
+	<key>TISIntendedLanguage</key><string>zh-Hant</string>
+	<key>tsInputMethodCharacterRepertoireKey</key><array><string>Hant</string><string>Latn</string></array>
+	<key>tsInputMethodIconFileKey</key><string>taipo.tiff</string>
+	<key>ComponentInputModeDict</key>
+	<dict>
+		<key>tsInputModeListKey</key>
+		<dict>
+			<key>com.unknowntpo.inputmethod.Taipo.zhuyin</key>
+			<dict>
+				<key>TISInputSourceID</key><string>com.unknowntpo.inputmethod.Taipo.zhuyin</string>
+				<key>TISIntendedLanguage</key><string>zh-Hant</string>
+				<key>tsInputModeCharacterRepertoireKey</key><array><string>Hant</string><string>Latn</string></array>
+				<key>tsInputModeMenuIconFileKey</key><string>taipo.tiff</string>
+				<key>tsInputModeAlternateMenuIconFileKey</key><string>taipo.tiff</string>
+				<key>tsInputModePaletteIconFileKey</key><string>taipo.tiff</string>
+				<key>tsInputModeDefaultStateKey</key><true/>
+				<key>tsInputModeIsVisibleKey</key><true/>
+				<key>tsInputModePrimaryInScriptKey</key><true/>
+				<key>tsInputModeScriptKey</key><string>smTradChinese</string>
+			</dict>
+		</dict>
+		<key>tsVisibleInputModeOrderedArrayKey</key>
+		<array><string>com.unknowntpo.inputmethod.Taipo.zhuyin</string></array>
+	</dict>
+</dict>
+</plist>

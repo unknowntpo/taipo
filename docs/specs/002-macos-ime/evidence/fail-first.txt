@@ -1,0 +1,35 @@
+✘ Test sessionCase(_:) recorded an issue with 1 argument c → I1: partial-syllable at SessionTests.swift:65:38: Expectation failed: (session.markedText → "") == (marked → "ji")
+✘ Test sessionCase(_:) recorded an issue with 1 argument c → I2: space-commits-english at SessionTests.swift:66:39: Expectation failed: (committed → "") == (text → "hello ")
+✘ Test "I13: router passes every key through when the session cannot be created" recorded an issue at SessionTests.swift:88:5: Expectation failed: (working.handle(.char("j")) → Response(consumed: false, commit: nil)).consumed → false
+✘ Test "I11: commitComposition commits the selected candidate and clears" recorded an issue at SessionTests.swift:74:5: Expectation failed: (session.commitComposition() → nil) == "婐"
+✘ Test sessionCase(_:) recorded an issue with 1 argument c → I1: partial-syllable at SessionTests.swift:67:46: Expectation failed: (last?.consumed → false) == (consumed → true)
+✘ Test sessionCase(_:) recorded an issue with 1 argument c → I1: complete-syllable at SessionTests.swift:65:38: Expectation failed: (session.markedText → "") == (marked → "我")
+✘ Test sessionCase(_:) recorded an issue with 1 argument c → I3: enter-commits at SessionTests.swift:66:39: Expectation failed: (committed → "") == (text → "我")
+✘ Test sessionCase(_:) recorded an issue with 1 argument c → I3: enter-commits at SessionTests.swift:67:46: Expectation failed: (last?.consumed → false) == (consumed → true)
+✘ Test sessionCase(_:) recorded an issue with 1 argument c → I2: space-as-tone1 at SessionTests.swift:65:38: Expectation failed: (session.markedText → "") == (marked → "因")
+✘ Test sessionCase(_:) recorded an issue with 1 argument c → I2: space-after-tone-commits-chinese at SessionTests.swift:66:39: Expectation failed: (committed → "") == (text → "我")
+✘ Test sessionCase(_:) recorded an issue with 1 argument c → I4: escape-clears at SessionTests.swift:67:46: Expectation failed: (last?.consumed → false) == (consumed → true)
+✘ Test sessionCase(_:) recorded an issue with 1 argument c → I6: up-clamps-at-first at SessionTests.swift:65:38: Expectation failed: (session.markedText → "") == (marked → "我")
+✘ Test sessionCase(_:) recorded an issue with 1 argument c → I6: down-selects-next at SessionTests.swift:65:38: Expectation failed: (session.markedText → "") == (marked → "婐")
+✘ Test sessionCase(_:) recorded an issue with 1 argument c → I5: backspace-removes-key at SessionTests.swift:65:38: Expectation failed: (session.markedText → "") == (marked → "ji")
+✘ Test sessionCase(_:) recorded an issue with 1 argument c → I7: commit-first-does-not-learn at SessionTests.swift:65:38: Expectation failed: (session.markedText → "") == (marked → "音")
+✘ Test sessionCase(_:) recorded an issue with 1 argument c → I5: backspace-removes-key at SessionTests.swift:67:46: Expectation failed: (last?.consumed → false) == (consumed → true)
+✘ Test sessionCase(_:) recorded an issue with 1 argument c → I6: down-clamps-at-last at SessionTests.swift:65:38: Expectation failed: (session.markedText → "") == (marked → "hrllo")
+✘ Test sessionCase(_:) recorded an issue with 1 argument c → I7: commit-first-does-not-learn at SessionTests.swift:66:39: Expectation failed: (committed → "") == (text → "因")
+✘ Test sessionCase(_:) recorded an issue with 1 argument c → I8: modified-key-commits-then-passes at SessionTests.swift:66:39: Expectation failed: (committed → "") == (text → "hello")
+✘ Test sessionCase(_:) recorded an issue with 1 argument c → I9: english-context-keeps-english at SessionTests.swift:66:39: Expectation failed: (committed → "") == (text → "hello up ")
+✘ Test sessionCase(_:) recorded an issue with 1 argument c → I8: other-key-commits-then-passes at SessionTests.swift:66:39: Expectation failed: (committed → "") == (text → "我")
+✘ Test sessionCase(_:) recorded an issue with 1 argument c → I9: chinese-context-keeps-zhuyin at SessionTests.swift:65:38: Expectation failed: (session.markedText → "") == (marked → "因")
+✘ Test sessionCase(_:) recorded an issue with 1 argument c → I7: commit-non-first-learns at SessionTests.swift:65:38: Expectation failed: (session.markedText → "") == (marked → "音")
+✘ Test sessionCase(_:) recorded an issue with 1 argument c → I9: chinese-context-keeps-zhuyin at SessionTests.swift:66:39: Expectation failed: (committed → "") == (text → "我")
+✘ Test "I14: learn write failure still commits and records a diagnostic" recorded an issue at SessionTests.swift:100:5: Expectation failed: (committed → "") == "婐"
+✘ Test sessionCase(_:) recorded an issue with 1 argument c → I7: commit-non-first-learns at SessionTests.swift:66:39: Expectation failed: (committed → "") == (text → "音")
+✘ Test "I14: learn write failure still commits and records a diagnostic" recorded an issue at SessionTests.swift:101:5: Expectation failed: session.diagnostics.contains { $0.contains("learn failed") }
+✘ Test "I13: router passes every key through when the session cannot be created" failed after 1.547 seconds with 1 issue.
+✘ Test sessionCase(_:) recorded an issue with 1 argument c → I16: digits-literal at SessionTests.swift:66:39: Expectation failed: (committed → "") == (text → "123 ")
+✘ Test "I11: commitComposition commits the selected candidate and clears" failed after 1.547 seconds with 1 issue.
+✘ Test sessionCase(_:) recorded an issue with 1 argument c → I15: over-max-length-literal at SessionTests.swift:66:39: Expectation failed: (committed → "") == (text → "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
+✘ Test "I14: learn write failure still commits and records a diagnostic" failed after 1.547 seconds with 2 issues.
+✘ Test sessionCase(_:) recorded an issue with 1 argument c → I10: capitalized-english at SessionTests.swift:66:39: Expectation failed: (committed → "") == (text → "Hello ")
+✘ Test sessionCase(_:) with 25 test cases failed after 1.547 seconds with 26 issues.
+✘ Test run with 4 tests in 0 suites failed after 1.548 seconds with 30 issues.
