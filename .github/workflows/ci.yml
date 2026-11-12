@@ -11,8 +11,10 @@ concurrency:
   cancel-in-progress: true
 jobs:
   core:
-    # GitHub-hosted macOS 26 (arm64); its default Xcode 26 provides Swift 6.2 (Package.swift tools version).
-    runs-on: macos-26
+    # Private repo: the owner's MacBook (self-hosted; hosted macOS minutes cost 10x on a private repo).
+    # Public repo: GitHub-hosted macOS 26 (arm64; Xcode 26 provides Swift 6.2). The runner is registered
+    # only in the private repo, so a wrong expression leaves a public job queued, never on the MacBook.
+    runs-on: ${{ github.repository == 'unknowntpo/taipo-private' && fromJSON('["self-hosted","macOS","ARM64"]') || 'macos-26' }}
     timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
@@ -31,3 +33,14 @@ jobs:
         run: |
           xcodebuild -downloadComponent MetalToolchain
           scripts/install-ime.sh --build
+  public-sync-dry-run:
+    # Spec 019 (Behavior 13): a PR that would leak private data fails here, before merge.
+    if: github.repository == 'unknowntpo/taipo-private'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Public sync dry run
+        run: scripts/public-sync.sh --dry-run --public https://github.com/unknowntpo/taipo.git

@@ -1,0 +1,85 @@
+# Spec 019 fail-first：commit b58c337 + Tests/TaipoDevTests/PublicSyncTests.swift，scripts/public-sync.sh 與 scripts/public_leak_gate.py 尚未存在，2026-10-28
+# swift test --filter TaipoDevTests（fixture 句子、email、金鑰、路徑都是編造的）
+✘ Test run with 16 tests in 0 suites failed with 63 issues.
+✘ Test "G1: the generated tree drops excluded paths and keeps the rest (dir/ and * glob boundaries)" failed with 2 issues.
+✘ Test "G2: --dry-run leaves both repos unchanged, keeps the generated tree and lists the changed files" failed with 2 issues.
+✘ Test "G3: a second sync with no new private commit makes no public commit and says already in sync" failed with 3 issues.
+✘ Test "G4: the sync commit sits on the old public head, by noreply, with Synced-From and no #number" failed with 6 issues.
+✘ Test "G8: a full private sentence (other spacing and case) fails as path:line private-sentence without printing it" failed with 2 issues.
+✘ Test "G9: a 10-character fragment with 2 non-ASCII characters fails; 9 characters, 1 non-ASCII or ASCII-only pass" failed with 4 issues.
+✘ Test "G10: the gate fails a tree that still has an excluded path, independently of the generator" failed with 2 issues.
+✘ Test "G11: audio and weight files fail by extension, header or size; a 5 MB text file passes" failed with 5 issues.
+✘ Test "G12: an absolute home path fails; ~/Library/Application Support/Taipo passes" failed with 2 issues.
+✘ Test "G13: a string listed in leak-patterns.txt fails; an unlisted email passes" failed with 2 issues.
+✘ Test "G14: each key format fails; one character shorter passes" failed with 17 issues.
+✘ Test "G15: commit author or committer other than noreply fails; a private sentence in the message fails" failed with 4 issues.
+✘ Test "G16: a missing or empty corpus, missing leak-patterns.txt or missing .public-exclude fails closed" failed with 4 issues.
+✘ Test "G17: an unported public commit blocks the sync and is listed; after Ported-From the sync fast-forwards" failed with 3 issues.
+✘ Test "G18: when public main moves during a sync the push is rejected without force; a rerun succeeds" failed with 3 issues.
+✘ Test "G19: the gate passes this repository's own generated public tree" failed with 2 issues.
+# G8、G16 的「失敗」斷言（status != 0）在沒有 script 時本來就成立；它們在這裡失敗的是「輸出 path:line 規則名稱」與「fail closed」訊息的斷言。
+
+# 實作後 mutation（每次改一處，跑 swift test --filter TaipoDevTests，2026-10-28）
+# public-sync.sh
+caught   glob magic 拿掉（* 跨 /）                 → G1
+caught   dry-run 不保留 tree                        → G1 G2
+caught   dry-run 也 push                            → G2
+caught   拿掉 already in sync 分支                  → G3
+caught   不刪 #數字                                 → G4
+caught   merge commit 不取 PR 標題                  → G4
+caught   commit 不以公開 HEAD 為 parent             → G3 G4 G17 G18
+caught   author 不是 noreply                        → G1 G2 G3 G4 G8 G17 G18（gate 擋下）
+caught   忽略未移植的公開 commit                    → G17
+caught   push 加 -f                                 → G18
+survived `dir/` 改成不加 `**`                       （等價：git pathspec 的 `private/` 本來就排除整個目錄）
+survived 拿掉 script 的「輸入為空」檢查             （等價：gate 也對空輸入 fail closed，G16 仍通過）
+# public_leak_gate.py
+caught   不轉小寫                                   → G8 G9
+caught   K=1                                        → G9 G19（本 repo 出現誤報，與 Example 表 N=10、K=1 的 1 個誤報一致）
+caught   N=9                                        → G9
+caught   拿掉 excluded-path 重檢                    → G10
+caught   大小門檻改成 >=                            → G11
+caught   拿掉 RIFF/WAVE 檔頭檢查                    → G11
+caught   home path regex 改錯                       → G12
+caught   身分比對區分大小寫                         → G13
+caught   gh token 長度 36 → 35                      → G14
+caught   sk- 拿掉前方邊界                           → G14 G19
+caught   不檢查 committer                           → G15
+caught   不掃 commit message                        → G15
+
+# 驗證者審查 bff194f 後的追加（2026-10-28）
+# fail-first：commit 515db08（新測試）在 bff194f 的 script 上，swift test --filter TaipoDevTests（fixture 都是編造的）
+✘ Test "G14: AKIA right after a letter or digit is not a key" failed with 1 issue.
+✘ Test "G23: a private sentence in UTF-16 (with or without BOM) or Big5 fails" failed with 9 issues.
+✘ Test "G21: a dry run writes the changed files and the gate counts to the job summary, without file content" failed with 3 issues.
+✘ Test "G24: a symlink pointing outside the tree fails; an in-tree symlink passes and its target text is scanned" failed with 3 issues.
+✘ Test "G22: a private sentence, home path or key in a file path fails as a redacted path; the path is never printed" failed with 2 issues.
+✘ Test run with 26 tests in 0 suites failed with 18 issues.
+# 其餘新測試（G1 註解行、G1 dir/ 錨定、G9 最後視窗、G11 ftyp 與 .mlpackage/、G25 worktree）在 bff194f 上就通過：
+# 行為本來就對，只是沒有測試。它們的價值在下面的 mutation：驗證者跑出的 survived 現在都 caught。
+# G14 失敗：舊 regex 的前方邊界是 [A-Z0-9]，小寫字母後的 AKIA 仍算金鑰，與 spec「前面不可緊接英數字」不一致；改成 [A-Za-z0-9]。
+
+# 實作後 mutation（commit c5266b4，每次改一處，跑 swift test --filter TaipoDevTests）
+caught   S-B gate：不跳過 # 註解行                  → G1
+caught   S-B script：不跳過 # 註解行                → G1
+caught   S-G gate：dir/ 不錨定根目錄                → G1
+caught   S-G script：dir/ 不錨定根目錄（**/dir/**）  → G1
+caught   S-I：worktree 只取已追蹤檔（add -u）        → G25
+caught   P-B：行內最後一個視窗不檢查                → G9
+caught   P-B：句子最後一個視窗不建                  → G9
+caught   P-E：拿掉 ftyp 檔頭                        → G11
+caught   P-D：只看檔名的副檔名                      → G11
+caught   P-F：AKIA 拿掉前方邊界                     → G14
+caught   P-K：symlink 一律放行                      → G24
+caught   P-K：不處理指向目錄的 symlink              → G24
+caught   P-K：不掃 symlink 目標字串                 → G24
+caught   路徑不跑文字規則                           → G22
+caught   同檔其他命中印原始路徑                     → G22
+caught   excluded-path 印原始路徑                   → G22
+caught   script：gate 前印差異清單                  → G22
+caught   只用 UTF-8 解碼                            → G23
+caught   拿掉 cp950                                 → G23
+caught   拿掉 UTF-16 BE                             → G23
+caught   只在無效 UTF-8 時試其他編碼（不看 NUL）    → G23
+caught   dry run 不寫差異清單到 job summary         → G21
+caught   dry run 不寫 gate 計數到 job summary       → G21

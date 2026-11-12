@@ -52,5 +52,7 @@ let package = Package(
         .testTarget(name: "TaipoIMETests", dependencies: ["TaipoCore", "TaipoIME"], resources: [.copy("Cases")]),
         .testTarget(name: "TaipoSpeechTests", dependencies: ["TaipoSpeech"]),
         .testTarget(name: "TaipoDecisionTests", dependencies: ["TaipoCore", "TaipoIME", "TaipoDecision"]),
+        // Spec 019: drives scripts/public-sync.sh and scripts/public_leak_gate.py against fixture git repos.
+        .testTarget(name: "TaipoDevTests"),
     ]
 )
