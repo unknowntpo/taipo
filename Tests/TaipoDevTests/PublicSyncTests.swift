@@ -451,7 +451,10 @@ func g19OwnTree() throws {
     // The public copy has no private/ and no .public-exclude: scan it with made-up inputs instead.
     if !exists(repoRoot, ".public-exclude") {
         let dir = try tempDir()
-        try write(dir, ["exclude": "private/\n", "corpus.tsv": fixtureCorpus, "patterns.txt": fixturePatterns])
+        // Built at run time: the fixture sentences above appear in this file, so they would match it.
+        let token = UUID().uuidString
+        let corpus = "g1\t企鵝 \(token) 圖書館\n", patterns = "\(token.lowercased())@example.invalid\n"
+        try write(dir, ["exclude": "private/\n", "corpus.tsv": corpus, "patterns.txt": patterns])
         args += ["--exclude-file", dir.appendingPathComponent("exclude").path,
                  "--corpus", dir.appendingPathComponent("corpus.tsv").path,
                  "--patterns", dir.appendingPathComponent("patterns.txt").path]
