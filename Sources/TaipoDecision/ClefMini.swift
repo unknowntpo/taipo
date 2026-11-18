@@ -25,6 +25,12 @@ public actor ClefMini: CandidateDecider {
     /// Best of 0.25–4 on the Spec 004 eval corpus (zh-typo 66.8% → 87.5%, 2026-10-19).
     public static let defaultLambda = 2.0
 
+    /// Spec 004 D17: MLX keeps freed GPU buffers in a cache with no size limit, so the IME
+    /// grew to 1.85 GB of `IOAccelerator (graphics)` over days. 32 MB measured on M1 Pro with
+    /// `taipo-bench decision` (1058 calls, 2026-11-06): peak 803 → 468 MB, p50 128 → 127 ms,
+    /// p95 147 → 131 ms, same accuracy.
+    public static let mlxCacheLimitBytes = 32 * 1024 * 1024
+
     private let container: ModelContainer
     public let lambda: Double
 
@@ -38,6 +44,7 @@ public actor ClefMini: CandidateDecider {
         guard FileManager.default.fileExists(atPath: directory.appendingPathComponent("config.json").path) else {
             throw LoadError.missingModel(directory)
         }
+        Memory.cacheLimit = mlxCacheLimitBytes
         let container = try await loadModelContainer(from: directory, using: TransformersTokenizerLoader())
         return ClefMini(container: container, lambda: lambda)
     }

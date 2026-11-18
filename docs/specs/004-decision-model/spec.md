@@ -64,6 +64,7 @@ Builds on: Spec 001–003
 - D13：[measure] Clef-mini 一次決定（≤ 5 候選）p95 ≤ 300 ms（背景執行）。
 - D14：[measure] 載入模型後 IME process 記憶體增量 ≤ 600 MB。
 - D15：[measure] 開啟時按鍵處理 p95 仍 ≤ 16 ms（Spec 002 I17）。
+- D17：[measure] 載入模型時把 MLX buffer cache 上限設為 32 MB（`ClefMini.mlxCacheLimitBytes`）。原因：MLX 的 cache 沒有上限，IME 執行數天後 `IOAccelerator (graphics)` 長到 1.85 GB（M1 Pro，2026-11-06）。上限不得降低正確率，且 D13 仍成立。單元測試不可行：CI 沒有 MLX metallib，碰 `Memory` 就中止。
 
 ### Observability
 - D16：`os_log` 記錄每次決定的候選、分數、選擇與延遲（只記在本機）。[manual]
@@ -81,3 +82,16 @@ Builds on: Spec 001–003
 - iOS（記憶體不足）。
 - 微調或訓練決策頭（後續 spec）。
 - Clef-flash 放進 IME。
+
+## 量測：D17 MLX cache 上限
+
+`/usr/bin/time -l .build/release/taipo-bench decision`，1058 次決定，M1 Pro。
+
+| 時間 | 版本 | peak memory footprint | max RSS | p50 | p95 | zh-typo λ=2 |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2026-11-06 | 無上限 | 803 MB | — | 128 ms | 147 ms | 同 |
+| 2026-11-06 | 32 MB | 468 MB | — | 127 ms | 131 ms | 同 |
+| 2026-11-12 | 無上限（`origin/main` 660654c） | 811 MB | 474 MB | 190 ms | 489 ms | 86.2% |
+| 2026-11-12 | 32 MB | 521 MB | 477 MB | 147 ms | 217 ms | 86.2% |
+
+2026-11-12 量測時機器 load average 約 96–163（其他工作），延遲只能看相對值。三類（mixed、zh-en、zh-typo）在每個 λ 的正確率都相同。
