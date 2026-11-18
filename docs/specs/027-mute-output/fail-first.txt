@@ -1,0 +1,26 @@
+# Spec 027 fail-first：commit 6a5c29a（測試＋只轉呼叫內部 recorder 的 MutingRecorder stub），2026-11-18
+# swift test --filter OutputMuteTests
+✔ Test "H15: an original device that is gone at stop is skipped and the marker cleared" passed.
+✘ Test run with 12 tests in 0 suites failed with 19 issues.
+✘ Test "H10: unmuted output is muted, and its UID recorded, before the inner recorder starts" failed with 3 issues.
+✘ Test "H11: stop unmutes, clears the marker, and returns the inner samples unchanged" failed with 1 issue.
+✘ Test "H12: output already muted by the user is never written and stays muted" with 2 test cases failed with 2 issues.
+✘ Test "H13: cancel unmutes and clears the marker" failed with 1 issue.
+✘ Test "H14: when the inner start throws, the error propagates and the output is already unmuted" failed with 1 issue.
+✘ Test "H15: when the default output changes mid-recording, stop unmutes the original device only" failed with 1 issue.
+✘ Test "H16: no mute property, a failed read, or no default device: recording starts, nothing written" with 3 test cases failed with 3 issues.
+✘ Test "H17: a failed mute write still records, writes no marker, and stop does not unmute" failed with 2 issues.
+✘ Test "H18: a leftover marker at launch unmutes that device and clears the marker; no marker does nothing" failed with 3 issues.
+✘ Test "H19: a leftover marker for a device that is gone is cleared without error" failed with 1 issue.
+✘ Test "H20: a second stop, or a stop without start, never unmutes a mute the user set" failed with 1 issue.
+# H12 只有正向對照（原本未靜音）那一列失敗；原本已靜音那一列在 stub 下本來就成立。
+# H20 在 stub 下失敗的是前段的寫入次數；「不重複取消靜音」由 mutation「restore 不清 mutedUID」證明（H20 失敗）。
+# 第二個 H15 測試（原裝置已拔除）在 stub 下通過；由 mutation「取消靜音失敗時不清紀錄」證明（H15、H19 失敗）。
+
+# Verifier 回饋（c582512）後新增的測試。實作已經存在，所以 fail-first 是對每個存活的 mutant 跑：
+# swift test --filter OutputMuteTests，2026-11-18
+# mutant「stop 先 restore 再 inner.stop()」→ ✘ "H11: the output is still muted while the inner recorder stops; unmuted only afterwards"
+# mutant「cancel 先 restore 再 inner.cancel()」→ ✘ "H13: the output is still muted while the inner recorder cancels; unmuted only afterwards"
+# mutant「取消靜音寫入失敗也回報 restored」→ ✘ "H26: a failed unmute write on a connected device clears the marker, reports skipped, and is not retried"
+# mutant「setMuted(true) 成功後才寫紀錄」→ ✘ "H10: the marker is written before the mute write, so a crash between them still recovers"
+# 未改的實作上，這 4 個測試都通過。

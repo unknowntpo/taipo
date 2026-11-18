@@ -65,14 +65,32 @@ enum DecisionState {
 /// when the switch goes off (W9).
 @MainActor
 enum VoiceState {
-    static let recorder = MicrophoneRecorder()
+    static let microphone = MicrophoneRecorder()
+    /// Spec 027: the output device is muted while the microphone records. The marker lives in the
+    /// IME's standard defaults: only this process writes or reads it, and inside the IME
+    /// `DecisionSettings.sharedDefaults` is that same domain anyway.
+    static let outputMute = CoreAudioOutputMute()
+    static let recorder = MutingRecorder(wrapping: microphone, device: outputMute, defaults: .standard,
+                                         onEvent: logOutputMute)
     static let recognizer = WhisperRecognizer()
     private static var loaded = false
+
+    /// Spec 027 Behavior 8: only the event name; never a device name or UID.
+    static func logOutputMute(_ event: OutputMuteEvent) {
+        voiceLog.notice("output \(String(describing: event), privacy: .public)")
+    }
 
     static func refresh() {
         if VoiceSettings.isAvailable() {
             guard !loaded else { return }
             loaded = true
+            // Spec 027 H21: the first CoreAudio query in a process takes about 100 ms; pay it on a
+            // background queue now, not on the first recording. Read-only: nothing is muted. A
+            // separate instance, because the adapter holds no state and is not shared across threads.
+            DispatchQueue.global(qos: .utility).async {
+                let warmUp = CoreAudioOutputMute()
+                _ = warmUp.defaultOutputUID().flatMap { warmUp.isMuted(uid: $0) }
+            }
             Task { @MainActor in
                 let start = Date()
                 do {
@@ -755,9 +773,14 @@ DistributedNotificationCenter.default().addObserver(forName: VoiceSettings.chang
     MainActor.assumeIsolated { VoiceState.refresh() }
 }
 MainActor.assumeIsolated { VoiceState.refresh() }
+// Spec 027 Behavior 5: unmute the output a previous IME process muted and did not restore.
+MainActor.assumeIsolated {
+    MutingRecorder.recoverAfterCrash(device: VoiceState.outputMute, defaults: .standard,
+                                     onEvent: VoiceState.logOutputMute)
+}
 // Spec 012 W13, W16: the microphone band levels drive the floating bar's waveform.
 MainActor.assumeIsolated {
-    VoiceState.recorder.onLevels = { levels in
+    VoiceState.microphone.onLevels = { levels in
         DispatchQueue.main.async { MainActor.assumeIsolated { VoiceBarPanel.session?.updateLevels(levels) } }
     }
 }
