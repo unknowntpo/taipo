@@ -9,8 +9,8 @@ let reps = [16, 32].map { size -> NSBitmapImageRep in
     rep.size = NSSize(width: 16, height: 16)
     NSGraphicsContext.saveGraphicsState()
     NSGraphicsContext.current = NSGraphicsContext(bitmapImageRep: rep)
-    let text = NSAttributedString(string: "破", attributes: [
-        .font: NSFont.systemFont(ofSize: 13, weight: .semibold),
+    let text = NSAttributedString(string: "PO", attributes: [
+        .font: NSFont.systemFont(ofSize: 9.5, weight: .bold),
         .foregroundColor: NSColor.black,
     ])
     let bounds = text.size()
