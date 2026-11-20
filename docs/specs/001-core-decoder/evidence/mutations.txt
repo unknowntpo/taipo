@@ -19,3 +19,60 @@ caught: F3 zh accepts any byte :: F3: non-layout-with-zhuyin, X9: every Spec 001
 caught: F4 no quarantine :: F4: corrupt user dictionary is quarantined and decoder starts empty
 caught: F6 memory not updated before save :: B7: learn-lexicon-word, F6: write failure throws but the in-memory choice still applies, I10: capitalized-learned-choice, I22: session keeps working after a failed learn
 caught: F8 malformed weight accepted :: 
+# 2026-11-13 B9/F9: mutate scripts/build_lexicon.py variant_size, regenerate en.tsv, run swift test --filter "englishVariant|decoderCase"
+caught: B9 British branch returns None :: B9: en lexicon has common words whose SCOWL lines carry spelling-variant info, B9: en-variant-gb, B9: en-variant-us-preferred
+caught: B9 British at US size (offset 0) :: B9: en-variant-us-preferred
+caught: F9 variant level ignored (any level accepted) :: F9: SCOWL variant levels above 1 stay out of the en lexicon, F9: en-variant-uncommon, F9: en-variant-gb-variant
+# 2026-11-19 B9/F9 boundaries: mutate scripts/build_lexicon.py, regenerate en.tsv from local Data/raw, run swift test --filter "englishVariant|decoderCase"; en.tsv byte-identical to HEAD after revert
+caught: B9 region-neutral _ ignored :: B9: region-neutral and level-1 SCOWL variants enter the en lexicon at the right size
+  Expectation failed: (["adrenaline", "advisor", "afterward"].filter { !lexicon.containsEnglish($0) } → ["adrenaline"]) == []
+caught: B9 only variant level 0 accepted :: B9: region-neutral and level-1 SCOWL variants enter the en lexicon at the right size
+  Expectation failed: (["adrenaline", "advisor", "afterward"].filter { !lexicon.containsEnglish($0) } → ["advisor", "afterward"]) == []
+caught: F9 level 2 (=) accepted :: B9: region-neutral and level-1 SCOWL variants enter the en lexicon at the right size, F9: SCOWL level-2 variants and sizes above 60 stay out of the en lexicon
+  Expectation failed: axe == (try englishLogp(lexicon, "adrenaline"))
+  Expectation failed: axe < (try englishLogp(lexicon, "adviser"))
+  Expectation failed: !((lexicon → TaipoCore.Lexicon).containsEnglish("amuck") → true)
+caught: F9 size > EN_MAX_SIZE check dropped :: F9: SCOWL level-2 variants and sizes above 60 stay out of the en lexicon
+  Expectation failed: !((lexicon → TaipoCore.Lexicon).containsEnglish("accessorise") → true)
+# 2026-11-19 B9/F9 {sense} tag and region boundaries: mutate scripts/build_lexicon.py after the regex fix, regenerate en.tsv from local Data/raw, run swift test --filter "englishVariant|englishSense|decoderCase"; en.tsv byte-identical to the fixed build after revert
+caught: B9 {sense} tag after the POS rejected (regex fix reverted; en.tsv 96829 lines) :: B9: SCOWL lines with a {sense} tag after the part of speech enter the en lexicon, B9: en-variant-sense-tag
+  Expectation failed: (words.filter { !lexicon.containsEnglish($0) } → ["so", "disk", "icon", "curb", "genius", "phenomenon", "die"]) == []
+  Expectation failed: (lexicon → TaipoCore.Lexicon).containsEnglish("tyre")
+  en-variant-sense-tag: Expectation failed: (texts.first → "dusk") == (expected → "disk")
+caught: F9 British branch accepts B= (level 2) (97236 lines) :: F9: British level-2 SCOWL spellings stay out of the en lexicon
+  Expectation failed: !((lexicon → TaipoCore.Lexicon).containsEnglish("encyclopaedia") → true)
+caught: B9 British branch ignores Z (97213 lines) :: B9: region-neutral and level-1 SCOWL variants enter the en lexicon at the right size
+  DecoderNamedTests.swift:161 #require failed: lexicon.en.node(for: "tranquillize") is nil (word absent)
+caught: B9 C/D-only lines treated as US (97348 lines) :: B9: Canadian-only and Australian-only SCOWL spellings stay out of the en lexicon
+  Expectation failed: (["yogourt", "verandah"].filter { lexicon.containsEnglish($0) } → ["yogourt", "verandah"]) == []
+caught: B9 C/D-only lines treated as British (97254 lines) :: B9: Canadian-only and Australian-only SCOWL spellings stay out of the en lexicon
+  Expectation failed: (["yogourt", "verandah"].filter { lexicon.containsEnglish($0) } → ["yogourt", "verandah"]) == []
+caught: B9 US level 1 gets the British size + 5 (97227 lines, sizes differ) :: B9: region-neutral and level-1 SCOWL variants enter the en lexicon at the right size
+  Expectation failed: try englishLogp(lexicon, "advisor") == size35
+  Expectation failed: try englishLogp(lexicon, "afterward") == size35
+# 2026-11-19 F9 British level V: mutate scripts/build_lexicon.py variant_size so the BZ branch also accepts "V", regenerate en.tsv from local Data/raw (uv run --no-project python -I), run swift test --filter "englishVariant|decoderCase"; en.tsv and zh.tsv byte-identical to HEAD after revert
+caught: F9 British branch accepts BV (level 6) (97250 lines; burkha 55) :: F9: British level-2 SCOWL spellings stay out of the en lexicon
+  Expectation failed: !((lexicon → TaipoCore.Lexicon).containsEnglish("burkha") → true)
+  (encyclopaedia assertion still passes under this mutation: before burkha was added, F9 did not pin level V)
+# 2026-11-19 B9 usage tag (D6): mutate the head-word regex in scripts/build_lexicon.py build_en to accept "(?: \([a-z]+-\d+\))?" after the sense tag, regenerate en.tsv from local Data/raw (uv run --no-project python -I -B), run swift test --filter englishUsageTaggedWordsExcluded, then git checkout the script and regenerate (en.tsv shasum cd024e01 again, byte-identical).
+caught: B9 accepts (vulgar-N)/(offensive-N) lines (97310 lines) :: B9: SCOWL lines with a (vulgar-N) or (offensive-N) usage tag stay out of the en lexicon
+  Expectation failed: (["asshole", "arsehole", "shit"].filter { lexicon.containsEnglish($0) } → ["asshole", "arsehole", "shit"]) == []
+  (positive control disk still passes under this mutation)
+# 2026-11-19 B9 usage tag (D6) and F9 levels ~ and -: mutate scripts/build_lexicon.py, regenerate en.tsv from local Data/raw (uv run --no-project python -I -B scripts/build_lexicon.py), run swift test --filter "englishVariant|englishUsage|englishSense|decoderCase", then git checkout the script and regenerate (en.tsv shasum cd024e01, zh.tsv d5577f9d, both byte-identical).
+caught: B9 accepts only (offensive-N) lines (97238 lines) :: B9: SCOWL lines with a (vulgar-N) or (offensive-N) usage tag stay out of the en lexicon
+  Expectation failed: !((lexicon → TaipoCore.Lexicon).containsEnglish("kraut") → true)
+  (asshole, arsehole, shit, crap, assholes assertions still pass)
+caught: B9 accepts usage levels 2–3 ("[a-z]+-[23]") (97261 lines) :: B9: SCOWL lines with a (vulgar-N) or (offensive-N) usage tag stay out of the en lexicon
+  Expectation failed: !((lexicon → TaipoCore.Lexicon).containsEnglish("kraut") → true)
+  Expectation failed: !((lexicon → TaipoCore.Lexicon).containsEnglish("crap") → true)
+caught: B9 accepts (vulgar-2|3) only (97255 lines) :: B9: SCOWL lines with a (vulgar-N) or (offensive-N) usage tag stay out of the en lexicon
+  Expectation failed: !((lexicon → TaipoCore.Lexicon).containsEnglish("crap") → true)
+  (kraut and the vulgar-1 assertions still pass)
+caught: B9 usage-tagged lines skip the head word but keep listed and inflections() forms, minus the head word (97278 lines) :: B9: SCOWL lines with a (vulgar-N) or (offensive-N) usage tag stay out of the en lexicon
+  Expectation failed: !((lexicon → TaipoCore.Lexicon).containsEnglish("assholes") → true)
+  (asshole, arsehole, shit, kraut, crap assertions still pass)
+caught: F9 A/_ branch accepts level ~ (97574 lines) :: F9: SCOWL level-2 variants and sizes above 60 stay out of the en lexicon
+  Expectation failed: (["cafe", "attache"].filter { lexicon.containsEnglish($0) } → ["cafe", "attache"]) == []
+  (SCOWL has no A~ line; the ~ lines are _~, e.g. "_~: cafe <n>: cafes")
+caught: F9 British branch accepts level - (97237 lines) :: F9: British level-2 SCOWL spellings stay out of the en lexicon
+  Expectation failed: (["gage", "gaolbreak"].filter { lexicon.containsEnglish($0) } → ["gage", "gaolbreak"]) == []

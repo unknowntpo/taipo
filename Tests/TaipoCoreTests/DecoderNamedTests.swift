@@ -134,3 +134,126 @@ func exactEnglishFirst(_ word: String) throws {
         #expect(candidates.dropFirst().filter { $0.language == .en && $0.source != .literal }.allSatisfy { !$0.edits.isEmpty })
     }
 }
+
+@Test("B9: en lexicon has common words whose SCOWL lines carry spelling-variant info")
+func englishVariantWords() throws {
+    let lexicon = try sharedLexicon.get()
+    // Positive control: a word on a plain SCOWL line, present before and after the fix.
+    #expect(lexicon.containsEnglish("travel"))
+    let us = ["practice", "practiced", "color", "center", "license", "defense", "program", "organize", "analyze", "gray", "advertise"]
+    #expect(us.filter { !lexicon.containsEnglish($0) } == [])
+    // British non-variant spellings (D5).
+    let gb = ["practise", "colour", "centre", "licence", "defence", "programme", "organise", "analyse", "grey"]
+    #expect(gb.filter { !lexicon.containsEnglish($0) } == [])
+}
+
+@Test("F9: SCOWL variant levels above 1 stay out of the en lexicon")
+func englishVariantLevels() throws {
+    let lexicon = try sharedLexicon.get()
+    // A-: advertize (uncommon), Bv: connexion (common variant), AV: esthete (acceptable).
+    #expect(["advertize", "connexion", "esthete"].filter { lexicon.containsEnglish($0) } == [])
+    // Positive control: the preferred forms of the same groups are present.
+    #expect(["advertise", "connection", "aesthete"].filter { !lexicon.containsEnglish($0) } == [])
+}
+
+/// Log-probability of an English lexicon word; equal values mean equal SCOWL size.
+private func englishLogp(_ lexicon: Lexicon, _ word: String) throws -> Float {
+    let node = try #require(lexicon.en.node(for: word.utf8))
+    return try #require(lexicon.en.entries(at: node).first { $0.text == word }).logp
+}
+
+@Test("B9: region-neutral and level-1 SCOWL variants enter the en lexicon at the right size")
+func englishVariantAccepted() throws {
+    let lexicon = try sharedLexicon.get()
+    // `_: adrenaline` (any region), `A. Bv C.: advisor` and `A. Cv: afterward` (US level 1).
+    #expect(["adrenaline", "advisor", "afterward"].filter { !lexicon.containsEnglish($0) } == [])
+    // Level 1 is the US size (35, the same as `travel`), not the British size + 5.
+    let size35 = try englishLogp(lexicon, "travel")
+    #expect(try englishLogp(lexicon, "advisor") == size35)
+    #expect(try englishLogp(lexicon, "afterward") == size35)
+    // `AV Z Cv: tranquillize` (size 35): only the British `Z` accepts it, so 35 + 5 = 40 like adrenaline.
+    #expect(try englishLogp(lexicon, "tranquillize") == (try englishLogp(lexicon, "adrenaline")))
+    #expect(try englishLogp(lexicon, "tranquilize") == size35)
+    // Size limit 60: `A Z: accessorize` at size 60 is in.
+    #expect(lexicon.containsEnglish("accessorize"))
+    // `A= B: axe` (size 35): US level 2 is ignored, so axe gets the British size 35 + 5 = 40,
+    // the same as adrenaline (size 40) and rarer than adviser (size 35).
+    let axe = try englishLogp(lexicon, "axe")
+    #expect(axe == (try englishLogp(lexicon, "adrenaline")))
+    #expect(axe < (try englishLogp(lexicon, "adviser")))
+}
+
+@Test("F9: SCOWL level-2 variants and sizes above 60 stay out of the en lexicon")
+func englishVariantRejected() throws {
+    let lexicon = try sharedLexicon.get()
+    // `A= Bv: amuck`: US level 2 and British variant, so it is out.
+    #expect(!lexicon.containsEnglish("amuck"))
+    // `B: accessorise` at size 60 becomes 60 + 5 = 65 > 60, so it is out.
+    #expect(!lexicon.containsEnglish("accessorise"))
+    // `_~: cafe <n>: cafes` and `_~: attache <n>: attaches, attache's` (size 35): region-neutral at level `~`,
+    // so the head words are out. SCOWL has no `A~` line; `_~` takes the same branch as `A`.
+    #expect(["cafe", "attache"].filter { lexicon.containsEnglish($0) } == [])
+    // Positive control: the same groups' accepted spellings are present, and `_: so <av> {:1}` (size 35)
+    // shows that the `_` branch accepts level 0. (The accepted spellings café and attaché are not ASCII.)
+    #expect(["amok", "accessorize", "so"].filter { !lexicon.containsEnglish($0) } == [])
+}
+
+@Test("B9: SCOWL lines with a {sense} tag after the part of speech enter the en lexicon")
+func englishSenseTaggedWords() throws {
+    let lexicon = try sharedLexicon.get()
+    let size35 = try englishLogp(lexicon, "travel")
+    // `_: so <av> {:1}`, `A B: disk <n> {:1}`, `A B: icon <n> {:1}`, `A C: curb <n> {street edge}: curbs` (size 35).
+    // Lines without variant info too: `genius <n> {brilliance}`, `phenomenon <n> {science}`, `die <v> {expire}`.
+    let words = ["so", "disk", "icon", "curb", "genius", "phenomenon", "die"]
+    #expect(words.filter { !lexicon.containsEnglish($0) } == [])
+    for word in words where lexicon.containsEnglish(word) {
+        #expect(try englishLogp(lexicon, word) == size35, "\(word)")
+    }
+    // `B: tyre <n> {wheel}` (size 35): British, so 35 + 5 = 40 like adrenaline.
+    #expect(lexicon.containsEnglish("tyre"))
+    if lexicon.containsEnglish("tyre") {
+        #expect(try englishLogp(lexicon, "tyre") == (try englishLogp(lexicon, "adrenaline")))
+    }
+}
+
+@Test("B9: Canadian-only and Australian-only SCOWL spellings stay out of the en lexicon")
+func englishVariantRegionalOnly() throws {
+    let lexicon = try sharedLexicon.get()
+    // `C: yogourt` (Canadian only), `Av Bv D: verandah` (Australian only at level 0), both size 35.
+    #expect(["yogourt", "verandah"].filter { lexicon.containsEnglish($0) } == [])
+    // Positive control: `A B Cv Dv: yogurt` and `A B Dv: veranda` from the same groups are present.
+    #expect(["yogurt", "veranda"].filter { !lexicon.containsEnglish($0) } == [])
+}
+
+@Test("F9: British level-2 SCOWL spellings stay out of the en lexicon")
+func englishVariantBritishLevel2() throws {
+    let lexicon = try sharedLexicon.get()
+    // `AV B= Cv Dv: encyclopaedia` (size 35): British level 2, US level 6, so it is out.
+    #expect(!lexicon.containsEnglish("encyclopaedia"))
+    // Positive control: `A B C D: encyclopedia` from the same group is present.
+    #expect(lexicon.containsEnglish("encyclopedia"))
+    // `BV: burkha` (size 50): British level 6 only, so it is out.
+    #expect(!lexicon.containsEnglish("burkha"))
+    // Positive control: `A B Dv: burka` from the same group is present.
+    #expect(lexicon.containsEnglish("burka"))
+    // `AV B-: gage <n>` (size 35) and `B-: gaolbreak <n>` (size 50): British level `-`, so they are out.
+    #expect(["gage", "gaolbreak"].filter { lexicon.containsEnglish($0) } == [])
+    // Positive control: `A B: gauge <n>` and `A B: jailbreak <n>` from the same groups are present.
+    #expect(["gauge", "jailbreak"].filter { !lexicon.containsEnglish($0) } == [])
+}
+
+@Test("B9: SCOWL lines with a (vulgar-N) or (offensive-N) usage tag stay out of the en lexicon")
+func englishUsageTaggedWordsExcluded() throws {
+    let lexicon = try sharedLexicon.get()
+    // `A: asshole <n> (vulgar-1)`, `B: arsehole <n> (vulgar-1)`, `_: shit <v> (vulgar-1)` (all size 40).
+    #expect(["asshole", "arsehole", "shit"].filter { lexicon.containsEnglish($0) } == [])
+    // `kraut <n> (offensive-2): krauts` (size 60): an offensive tag, not only vulgar ones.
+    #expect(!lexicon.containsEnglish("kraut"))
+    // `crap <n> (vulgar-3)` (size 35): a higher vulgar level, not only level 1.
+    #expect(!lexicon.containsEnglish("crap"))
+    // `assholes` is listed on the `A: asshole <n> (vulgar-1): assholes, asshole's` line: inline forms are out too.
+    #expect(!lexicon.containsEnglish("assholes"))
+    // Positive control: the only `(…)` usage tags in SCOWL are vulgar and offensive, so the control is
+    // a marked line with a `{sense}` tag in the same slot: `A B: disk <n> {:1}`.
+    #expect(lexicon.containsEnglish("disk"))
+}

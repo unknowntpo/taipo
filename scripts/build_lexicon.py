@@ -3,6 +3,9 @@
 
 Usage: python3 -I scripts/build_lexicon.py Data/raw Sources/TaipoCore/Resources
 
+SCOWL source: data/scowl-pre.txt from https://github.com/en-wl/wordlist branch v2
+(commit 1e5b7d3, 2026-06-24, for the current en.tsv).
+
 Outputs (sorted, tab separated):
   zh.tsv  keys<TAB>phrase<TAB>count   keys are Dachen (大千) key strokes; tone 1 is a space.
   en.tsv  word<TAB>size               SCOWL size (35 = most common).
@@ -21,6 +24,10 @@ DACHEN = {
 }
 TONES = {"ˊ": "6", "ˇ": "3", "ˋ": "4", "˙": "7"}
 EN_MAX_SIZE = 60
+# SCOWL VARIANT-INFO before the lemma, e.g. "A B C: practice <n>" or "_V {1}: bogie <n>".
+# Letter = spelling (A US, B/Z GB, C CA, D AU, _ any); symbol = variant level (none 0, "." 1, ...).
+EN_VARIANT_INFO = re.compile(r"((?:[ABZCD_][.=?v~V@x-]?)(?: [ABZCD_][.=?v~V@x-]?)*(?: \{\d+\})?): ")
+EN_GB_OFFSET = 5  # Spec 001 D5: British spellings rank half a tier below US ones.
 
 
 def syllable_keys(syllable):
@@ -96,6 +103,16 @@ def inflections(word, pos):
     return forms
 
 
+def variant_size(info, size):
+    """Spec 001 Behavior 9: size for a lemma with SCOWL variant info, or None to skip it."""
+    levels = {t[0]: t[1:] for t in info.split() if t[0] in "ABZCD_"}
+    if any(levels.get(s) in ("", ".") for s in "A_"):
+        return size
+    if any(levels.get(s) in ("", ".") for s in "BZ"):
+        return size + EN_GB_OFFSET
+    return None
+
+
 def build_en(raw):
     best = {}
     for line in (raw / "scowl-pre.txt").read_text(encoding="utf-8").splitlines():
@@ -106,11 +123,20 @@ def build_en(raw):
         if not sizes or min(sizes) > EN_MAX_SIZE:
             continue
         size = min(sizes)
-        m = re.match(r"([a-z]+)(?: <([^>]*)>)?(?:: (.*))?", rest.split(" #")[0].strip())
-        if not m or m.end() != len(rest.split(" #")[0].strip()):
+        body = rest.split(" #")[0].strip()
+        v = EN_VARIANT_INFO.match(body)
+        if v:
+            size = variant_size(v.group(1), size)
+            if size is None or size > EN_MAX_SIZE:
+                continue
+            body = body[v.end():]
+        # Optional "{...}" after the POS is a sense tag, e.g. "disk <n> {:1}" or "curb <n> {street edge}".
+        m = re.fullmatch(r"([a-z]+)(?: <([^>]*)>)?(?: \{[^}]*\})?(?:: (.*))?", body)
+        if not m:
             continue
         word, pos = m.group(1), m.group(2) or ""
-        listed = set(re.findall(r"[a-z]+", m.group(3) or ""))
+        # A lowercase run followed by ":" is a derived form's variant level (e.g. "v: caravanserai"), not a word.
+        listed = set(re.findall(r"[a-z]+(?![a-z:])", m.group(3) or ""))
         derived_size = min(size + 5, EN_MAX_SIZE)
         for form, s in [(word, size)] + [(f, derived_size) for f in inflections(word, pos) | listed]:
             if best.get(form, math.inf) > s:

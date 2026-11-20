@@ -1,0 +1,31 @@
+Spec 001 B9/F9 fail-first (2026-11-13). en.tsv from origin/main c4b4ad1, before the build_lexicon.py fix.
+Command: swift test --filter "englishVariant|decoderCase"
+Passing rows (not shown): en-no-variant-control (travel) and the F9 "absent" checks, as expected before the fix.
+
+✘ Test "F9: SCOWL variant levels above 1 stay out of the en lexicon" recorded an issue: Expectation failed: (["advertise", "connection", "aesthete"].filter { !lexicon.containsEnglish($0) } → ["advertise", "connection", "aesthete"]) == []
+✘ Test "B9: en lexicon has common words whose SCOWL lines carry spelling-variant info" recorded an issue: Expectation failed: (us.filter { !lexicon.containsEnglish($0) } → ["practice", "practiced", "color", "center", "license", "defense", "program", "organize", "analyze", "gray", "advertise"]) =
+✘ Test "B9: en lexicon has common words whose SCOWL lines carry spelling-variant info" recorded an issue: Expectation failed: (gb.filter { !lexicon.containsEnglish($0) } → ["practise", "colour", "centre", "licence", "defence", "programme", "organise", "analyse", "grey"]) == []
+✘ Test decoderCase(_:) recorded an issue with 1 argument c → B9: en-variant-us-license: Expectation failed: (texts.first → "licensee") == (expected → "license")
+✘ Test decoderCase(_:) recorded an issue with 1 argument c → B9: en-variant-us: Expectation failed: (texts.first → "proactive") == (expected → "practice")
+✘ Test "F9: SCOWL variant levels above 1 stay out of the en lexicon" failed after 1.563 seconds with 1 issue.
+✘ Test "B9: en lexicon has common words whose SCOWL lines carry spelling-variant info" failed after 1.564 seconds with 2 issues.
+✘ Test decoderCase(_:) recorded an issue with 1 argument c → F9: en-variant-uncommon: Expectation failed: (texts.first → "advertiser") == (expected → "advertise")
+✘ Test decoderCase(_:) recorded an issue with 1 argument c → B9: en-variant-gb: Expectation failed: (texts.first → "cloud") == (expected → "colour")
+✘ Test decoderCase(_:) recorded an issue with 1 argument c → F9: en-variant-gb-variant: Expectation failed: (texts.first → "connexion") == (expected → "connection")
+✘ Test decoderCase(_:) with 46 test cases failed after 1.578 seconds with 7 issues.
+✘ Test run with 3 tests in 0 suites failed after 1.579 seconds with 10 issues.
+
+Row en-variant-us-preferred uses organie (first draft centr failed after the fix too: cent is also 1 edit and ranks first; theatr did not catch mutation M3). Re-run on the old en.tsv:
+✘ Test decoderCase(_:) recorded an issue with 1 argument c → B9: en-variant-us-preferred: Expectation failed: (texts.first → "organ") == (expected → "organize")
+✘ Test decoderCase(_:) recorded an issue with 1 argument c → B9: en-variant-us-preferred: Expectation failed: (top3 → ["organ", "organic", "organism"]).contains(word → "organise")
+
+2026-11-19 fail-first for the {sense}-tag fix. en.tsv from HEAD 64b7ba6 (before the build_lexicon.py regex fix); tests from this commit.
+Command: swift test --filter "englishVariant|englishSense|decoderCase"
+The Z-only, C/D-only and B= tests pass on 64b7ba6 (they pin existing behavior); mutations.txt shows each one failing against its mutation.
+
+✘ Test "B9: SCOWL lines with a {sense} tag after the part of speech enter the en lexicon" recorded an issue at DecoderNamedTests.swift:204:5: Expectation failed: (words.filter { !lexicon.containsEnglish($0) } → ["so", "disk", "icon", "curb", "genius", "phenomenon", "die"]) == []
+✘ Test decoderCase(_:) recorded an issue with 1 argument c → B9: en-variant-sense-tag at DecoderCaseTests.swift:55:38: Expectation failed: (texts.first → "dusk") == (expected → "disk")
+✘ Test decoderCase(_:) with 47 test cases failed after 2.963 seconds with 1 issue.
+✘ Test "B9: SCOWL lines with a {sense} tag after the part of speech enter the en lexicon" recorded an issue at DecoderNamedTests.swift:209:5: Expectation failed: (lexicon → TaipoCore.Lexicon).containsEnglish("tyre")
+✘ Test "B9: SCOWL lines with a {sense} tag after the part of speech enter the en lexicon" failed after 15.339 seconds with 2 issues.
+✘ Test run with 8 tests in 0 suites failed after 15.339 seconds with 3 issues.

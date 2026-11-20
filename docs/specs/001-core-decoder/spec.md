@@ -1,6 +1,6 @@
 # Spec 001: TaipoCore 解碼引擎
 
-Status: Accepted (2026-10-17；D1–D4 依建議)
+Status: Accepted (2026-10-17；D1–D4 依建議)；Behavior 9、D5 為 2026-11-13 修訂，2026-11-19 human 接受（D5 依建議）；D6 為 2026-11-19 新增（owner 交由 agent 決定）
 Date: 2026-10-17
 Traceability: enforced
 Builds on: —
@@ -49,6 +49,48 @@ Builds on: —
 
 原本草稿預期 `up␣` 第一是「音」，真實詞頻是「因」，已改 case file。
 
+### 修訂 2026-11-13：有拼法變體的英文字
+
+使用者回報（2026-11-13）：打 `practice` 變成 `proactive`。
+原因：`en.tsv` 沒有 `practice`，引擎把它當錯字，改成 2 次編輯外的 `proactive`。
+
+SCOWL 原始資料：`en-wl/wordlist` 分支 `v2`，commit `1e5b7d3`（2026-06-24），檔案 `data/scowl-pre.txt`。
+它與本 repo 建置用的檔案 git blob 相同（`283adae`）。有變體的字在詞條前多一段拼法標記：
+
+```
+35 [] [12dicts] [ukfreq] … 85 [ukacd]: A B C: practice <n>
+35 [] [12dicts] [ukfreq] … 85 [ukacd]: AV Cv: practise <n>
+35 [] [12dicts] [ukfreq] … 85 [ukacd]: A Cv DV: color <n>
+35 [] [12dicts] [ukfreq] … 85 [ukacd]: B C D: colour <n>
+```
+
+`A`＝美式、`B`／`Z`＝英式、`C`＝加拿大、`D`＝澳洲、`_`＝不分地區。
+字母後的符號是變體等級：沒有符號＝0（非變體）、`.`＝1、`v`＝4、`V`＝6、`-`＝8，依此類推。
+修訂前的 `build_en` 只接受小寫字開頭的詞條，所以這些行全部被跳過。
+
+修訂前後的第一名（2026-11-13，`swift test` case rows；修訂前輸出見 `evidence/fail-first-b9.txt`）：
+
+| 按鍵 | 修訂前第一名 | 修訂後第一名 |
+| --- | --- | --- |
+| `practice` | proactive | practice |
+| `license` | licensee | license |
+| `colour` | cloud | colour |
+| `organie` | organ | organize（organise 在前三） |
+| `advertize` | advertiser | advertise |
+
+`build_en` 修訂後 `en.tsv` 從 90,881 行增為 97,227 行：新增 6,346 個字，17 個字的 size 變小（例如 `aging` 40 → 35），沒有字被移除。
+
+2026-11-19 補修：詞性後帶語意標記 `{…}` 的行（例如 `_: so <av> {:1}`、`A B: disk <n> {:1}`）原本整行被跳過。
+這次補修多收 398 個字（96,829 → 97,227 行；含屈折形），沒有字被移除。
+其中 106 個原形來自有拼法標記的行（例如 so、disk、disc、icon、story、prize、tire、curb、analog、dialog、casino、whiskey），38 個來自沒有拼法標記的行（例如 die、genius、axis、phenomenon）。
+另有 6 個字的 size 變小，因為它們的原形行現在讀得到（例如 `weaving` 50 → 40、`dyke` 40 → 35）。
+
+| 按鍵 | 補修前第一名 | 補修後第一名 |
+| --- | --- | --- |
+| `disk` | dusk | disk |
+
+`swift run -c release taipo-bench decision`（Spec 004）修訂前後相同：zh-typo 引擎 66.8%、λ=1.00 86.3%；zh-en 87.5%；mixed 100%。M1–M3 在量測雜訊內（M1 p95 2.75 → 2.78 ms、M2 31.9 → 29.5 MB、M3 49.8 → 48.4 ms）。
+
 ## Behavior
 
 1. **API**：`Decoder.candidates(for input: String, previousLanguage: Language?) -> [Candidate]`。`Candidate` 含 `text`、`language`（`zh`／`en`）、`edits`（套用的編輯）、`score`。由 Spec 002 的候選窗使用。
@@ -59,6 +101,7 @@ Builds on: —
 6. **語言判斷**：只有一種語言有 0 編輯候選時，該語言全部排在前面；兩種都有時，`previousLanguage` 那一種在前，沒有 hint 時預設 `zh`（D3）；兩種都沒有時，依分數交錯排序。
 7. **使用者字典**：`learn(input:chosen:)` 之後：(a) 同樣輸入時 `chosen` 排第一；(b) `chosen` 若不在詞庫中，就成為使用者詞，參與之後的模糊匹配。資料以 JSON 原子寫入指定路徑，重啟後仍存在。
 8. **原文保底**：原始輸入（英文字面）一定是候選之一，讓使用者永遠能送出自己打的內容。
+9. **拼法變體**：英文詞庫讀取 SCOWL 行首的拼法標記，決定該行原形（head word）是否進詞庫、以什麼 size 進。美式（`A`）或不分地區（`_`）且變體等級 ≤ 1 的字，以該行 size 進詞庫。英式（`B`、`Z`）且等級 ≤ 1 的字，以 size + 5 進詞庫（D5）。等級 ≥ 2 的變體（例如 `A-: advertize`、`Bv: connexion`、`B=: encyclopaedia`）不進詞庫。只標 `C`（加拿大）或 `D`（澳洲）的字不進詞庫（例如 `C: yogourt`、`Av Bv D: verandah`）。詞性後的語意標記 `{…}`（例如 `_: so <av> {:1}`、`A C: curb <n> {street edge}: curbs`）不影響讀取；沒有拼法標記的行也一樣（例如 `genius <n> {brilliance}`）。詞性後帶用語標記 `(vulgar-N)` 或 `(offensive-N)` 的行，整行不進詞庫，原形與行內形式都不收（例如 `A: asshole <n> (vulgar-1)`、`B: arsehole <n> (vulgar-1)`、`_: shit <v> (vulgar-1)`，見 D6）。拼法標記對原形的規則與 SCOWL 預設美式字表 `word-list 60 A 1` 相同，再加上英式非變體字；用語標記這條是本專案自己的規則。拼法標記的規則只管原形；屈折形與衍生形還不照這條規則，見 Non-goals 的「英文屈折形的變體等級」。
 
 ## Acceptance
 
@@ -71,6 +114,7 @@ Builds on: —
 - B6：見 `zh-only-exact` 到 `tie-no-hint`。
 - B7：見 `learn-literal`、`user-word-fuzzy`、`user-word-control`；另加具名測試 `B7 persists across restart`：learn → 用同一路徑重建 Decoder → 結果仍排第一。
 - B8：見 `literal-always`。
+- B9：見 `en-variant-us` 到 `en-no-variant-control`；另加具名測試 `B9 en lexicon has common words whose SCOWL lines carry spelling-variant info`（詞庫含 practice、color、center、license、program、organize 等，以及英式 colour、centre 等；正向對照 travel）、`B9 region-neutral and level-1 SCOWL variants enter the en lexicon at the right size`（advisor、afterward 為 size 35；只有 `Z` 的 tranquillize 為 35 + 5 = 40）、`B9 SCOWL lines with a {sense} tag after the part of speech enter the en lexicon`（so、disk、icon、curb、genius、phenomenon、die 為 size 35，tyre 為 40）、`B9 Canadian-only and Australian-only SCOWL spellings stay out of the en lexicon`（yogourt、verandah 不在；正向對照 yogurt、veranda）、`B9 SCOWL lines with a (vulgar-N) or (offensive-N) usage tag stay out of the en lexicon`（asshole、arsehole、shit 不在；`(offensive-2)` 的 kraut、`(vulgar-3)` 的 crap 不在；行內形式 assholes 也不在；正向對照 disk，同一位置是 `{…}` 語意標記的行）。`en-variant-sense-tag`：打 `disk` 第一名是 disk。
 
 ### Failure and retry
 - F1：空輸入 → 回傳空陣列，不 crash。
@@ -81,6 +125,7 @@ Builds on: —
 - F6：使用者字典寫入失敗（目錄唯讀）→ `learn` 拋出 `UserDictionaryError.writeFailed`，記憶體中的學習在本次執行仍有效。
 - F7：只有聲調鍵（如 `3333`）→ 沒有注音候選，原文仍在候選中。
 - F8：詞庫資源缺失或格式錯誤 → 初始化拋出 `LexiconError`，不使用 `fatalError`。
+- F9：行首變體等級 ≥ 2 的 SCOWL 行，不會把它自己的原形帶進詞庫。同一個字仍可能由其他行的行內清單或 `inflections()` 進詞庫（見 Non-goals）→ 打 `advertize` 第一名是 `advertise`、打 `connexion` 第一名是 `connection`。見 `en-variant-uncommon`、`en-variant-gb-variant`；另加具名測試（`_~: cafe`、`_~: attache` 不在；SCOWL 沒有 `A~` 行，`_~` 與 `A` 走同一條規則；正向對照：同組的首選拼法與 `_: so` 在詞庫中），以及 `F9 British level-2 SCOWL spellings stay out of the en lexicon`（`AV B= Cv Dv: encyclopaedia`、`BV: burkha`、`AV B-: gage`、`B-: gaolbreak` 不在；正向對照 encyclopedia、burka、gauge、jailbreak）。
 
 ### Budget
 在本機量測（Apple Silicon，macOS 26.3，release build）。下限依據 Spec 002 IME 的每鍵回應，以及未來 iOS 鍵盤 extension 的記憶體限制。
@@ -128,7 +173,15 @@ Builds on: —
 | B7 | user-word-fuzzy | `taipi` | — | taipo→taipo | top3 ∋ taipo |
 | B7 | user-word-control | `taipi` | — | — | ∌ taipo |
 | B8 | literal-always | `qqqqq` | — | — | ∋ qqqqq |
+| B9 | en-variant-us | `practice` | — | — | top1 = practice |
+| B9 | en-variant-sense-tag | `disk` | — | — | top1 = disk |
+| B9 | en-variant-us-license | `license` | — | — | top1 = license |
+| B9 | en-variant-gb | `colour` | — | — | top1 = colour |
+| B9 | en-variant-us-preferred | `organie` | — | — | top1 = organize; top3 ∋ organise |
+| B9 | en-no-variant-control | `travel` | — | — | top1 = travel |
 | F1 | empty | `` | — | — | count = 0 |
+| F9 | en-variant-uncommon | `advertize` | — | — | top1 = advertise |
+| F9 | en-variant-gb-variant | `connexion` | — | — | top1 = connection |
 | F2 | max-length | `abcdefghijabcdefghijabcdefghijab` | — | — | fuzzy = on |
 | F2 | over-max-length | 33 鍵 | — | — | fuzzy = off; count = 1 |
 | F2 | multibyte-max-length | é×32 | — | — | fuzzy = on |
@@ -147,6 +200,8 @@ Builds on: —
 | D2 | 詞庫來源 | 注音：McBopomofo 資料（MIT＋libtabe BSD，含 `phrase.occ` 詞頻）。英文：SCOWL size ≤ 60 的字表，以 size 級別當詞頻 | 都允許閉源商用，只需保留授權聲明。不用 vChewing（詞頻資料限非商用）、libchewing／RIME（LGPL）、wordfreq 與 FrequencyWords（BY-SA）、Norvig count_1w（未標資料授權）。 |
 | D3 | 兩種語言平手、又沒有 hint 時的預設 | `zh` | 主要使用情境是注音輸入法。 |
 | D4 | 使用者字典格式 | JSON 檔 | 001 只有單一 process；Spec 003 語音 App 共用時再評估 SQLite。 |
+| D5 | 英式拼法（`colour`、`centre`、`practise`）是否進詞庫（2026-11-13 提出，2026-11-19 human 接受建議） | 進詞庫，但 size + 5（約低半級），美式為主 | 英式拼法是合法英文字。不收的話，打 `colour` 會被當成錯字改掉（修訂前第一名是 cloud），和 `practice` 被改成 `proactive` 是同一類錯。size + 5 讓兩種拼法都差一次編輯時美式排前（`organie` → organize）。代價：美國使用者把 `center` 打成對調的 `centre` 時，不再自動修正，center 仍在前三。只收美式的替代方案：刪掉 `build_en` 中英式那一支即可。 |
+| D6 | 帶用語標記 `(vulgar-N)`／`(offensive-N)` 的 SCOWL 行是否進詞庫（2026-11-19，owner 交由 agent 決定） | 不進詞庫 | 輸入法不應主動建議粗俗或冒犯字，也不應把別的字自動修正成這些字。使用者打的原文仍是候選（Behavior 8），所以仍能送出。代價：使用者真的要打這些字時，第一名會是別的字。例如 `taipo explain shit` 第一名是 hit，原文 shit 是第 10 名（最後一名）；main 也一樣。另一個分支正在做「原文放第 2 名」，做完後這些字就容易選到。SCOWL 只有這兩種用語標記。計數定義：size ≤ 60、原形或 `-` 之後（有詞性時在詞性之後）帶 `(vulgar-N)` 或 `(offensive-N)` 的行，不論拼法標記（例如 `shitted (vulgar-1)` 沒有詞性也算）。這樣有 54 行：49 行是原形行（37 個不同原形），5 行是 `-` 續行；50 行沒有拼法標記。其中 `_v: shat <v> (vulgar-1)` 也不符合 Behavior 9 的等級規則，所以後面「多 83 行」的數字不受它影響。這些行的原形、行內形式與 `inflections()` 猜出的形式中，本 PR 的 `en.tsv` 只含 buggered：它由沒有用語標記的 `buggered <aj>` 行（size 60）進詞庫，main 也有。要收的話：讓 `build_en` 的原形 regex 接受 `(?: \([a-z]+-\d+\))?`，`en.tsv` 會多 83 行。 |
 
 ## 簡化審查
 
@@ -169,3 +224,10 @@ Builds on: —
 - 拼音、倚天等其他注音配置。
 - 同一 buffer 內中英混打（後由 Spec 003 處理）。
 - 依上下文的 n-gram 語言模型、雲端任何功能。
+- 英文屈折形的變體等級（Behavior 9 後續，另開 PR）：Behavior 9 與 F9 只管 SCOWL 行首標記對該行原形的效果。以下路徑目前不看變體等級（2026-11-19，本 PR 的 `en.tsv` 對 main）。
+  - 等級 ≥ 2 的原形由其他路徑進詞庫：13 個字在 size ≤ 60 的行中只在等級 ≥ 2 的行當原形，卻由別行的 `listed` 或 `inflections()` 進詞庫：bros、calking、caps、caulking、diss、doggoned、drier、ins、kidnaping、mos、nos、programing、vs。其中 calking、caulking、diss、programing 4 個是本 PR 新增，其他 9 個 main 已有。
+  - 英式 size 60 原形：5 個字在 size ≤ 60 的行中只在 `B:` 行當原形，size 60 + 5 = 65 > 60，該行不收它，卻由其他路徑以 size 40–60 進詞庫：travelling、tasselled、iodised、vulcanised、kerbing。其中 travelling 以外 4 個是本 PR 新增。
+  - 只以等級 ≥ 2 出現的新字：定義為不在 main、本 PR 新增，不是任何被接受行的原形，而且在 SCOWL size ≤ 60 的行中每次出現（原形或行內形式；行內標記優先於行首標記）都不符合 Behavior 9 的等級與地區。帶字尾標記的行內形式（例如 `A B: tyro <n>: (tyros | -: tyroes!)` 的 tyroes）也算一次出現；至少要出現一次。共 43 個：20 個經由行內清單 `listed`（例如 canst、wouldst、clipt、presidia；其中 10 個也由 `inflections()` 猜出，例如 dominos、insignias），23 個只由 `inflections()` 猜出（例如 chilis、esophaguses、programed）。diss、programing 同時算在上面 13 個裡。
+  - 行內清單：`build_en` 的 `listed` 讀取行內的 `(A B: kidnapped | AV: kidnaped)`，但不看每項的等級。本 PR 新讀到的行因此帶進等級 ≥ 2 的形式，例如 cicatrixes、presidia、reprograming（`A=: presidia`、`_~: reprograming`）。main 上本來就有同類字（例如 kidnaped、deprogramed）。
+  - `-` 續行：`A B: - <v>: (A B: programmed | Av: programed)` 這類續行目前整行跳過。計數定義：size ≤ 60 的 `-` 續行中的小寫形式，行內標記優先於行首標記，套用 Behavior 9 的等級與地區規則（含用語標記），但不套英式 + 5 後的 size 上限。帶字尾標記（`!`、`-`、`*`，例如 `- <v>: -, (birdying! | -: birdieing!), -` 的 birdying）的形式不算。這樣有 3,183 個不在 main 的 `en.tsv`、2,356 個不在本 PR 的 `en.tsv`（例如 ate、began、became、bigger）。若再套英式 + 5 後 ≤ 60 的上限，是 3,153 與 2,336；差的 30 與 20 個是英式 size 60 行的形式（例如 bejewelled、relabelled）。不套上限、但把帶字尾標記的形式（去掉標記）也算進去，是 3,190 與 2,363。
+  - `inflections()` 猜測：它替新讀到的原形猜屈折形，猜出的拼法可能是 SCOWL 標為等級 ≥ 2 的寫法，例如 programed、programing、reprogramed、chilis、esophaguses、oesophaguses。它用 `"v" in pos` 判斷動詞，所以副詞 `<av>` 也會被猜，本 PR 新增 soed、soing、afterwarded、backwardsed（main 已有 quicklied）。
